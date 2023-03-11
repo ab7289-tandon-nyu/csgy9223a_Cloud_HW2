@@ -1,0 +1,4 @@
+VPCID: vpc-06dddc2a059e86959
+Private Subnet: subnet-07e49d6e243a9d766
+
+Security Group: sg-036e720631eabe997
