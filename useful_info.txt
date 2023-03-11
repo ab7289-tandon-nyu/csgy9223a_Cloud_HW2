@@ -1,4 +1,9 @@
 VPCID: vpc-06dddc2a059e86959
 Private Subnet: subnet-07e49d6e243a9d766
-
+Routing Table: rtb-03db14cb4cf7dae6c
 Security Group: sg-036e720631eabe997
+
+
+CloudFormation_
+StackName: csgy9223a-hw2-photo-stack
+ARN: arn:aws:cloudformation:us-east-1:979351636556:stack/csgy9223a-hw2-photo-stack/ff5bbb20-c028-11ed-92cf-0ec3ec06a8bf

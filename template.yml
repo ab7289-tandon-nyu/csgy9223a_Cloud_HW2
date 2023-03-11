@@ -10,17 +10,43 @@ Parameters:
     Type: String
   VPCSubnet:
     Type: String
+  VPCRoutingTable:
+    Type: String
+  VpcId:
+    Type: String
 
 
 Resources:
   # S3 Bucket#############################################################################
   ImagesBucket:
     Type: 'AWS::S3::Bucket'
-    Properties:
-      NotificationConfiguration:
-        LambdaConfigurations:
-          - Event: s3:ObjectCreated:Put
-            Function: !GetAtt PhotoIndexLambda.Arn
+    # Properties:
+    #   NotificationConfiguration:
+    #     LambdaConfigurations:
+    #       - Event: s3:ObjectCreated:Put
+    #         Function: !GetAtt PhotoIndexLambda.Arn
+
+  # S3VpcAccessPoint:
+  #   Type: 'AWS::S3::AccessPoint'
+  #   Properties:
+  #     Bucket: !Ref ImagesBucket
+  # S3GatewayEndpoint:
+  #   Type: AWS::EC2::VPCEndpoint
+  #   Properties:
+  #     PolicyDocument:
+  #       Version: 2012-10-17
+  #       Statement:
+  #         - Effect: Allow
+  #           Principal: "*"
+  #           Action:
+  #             - s3:GetObject
+  #           Resource: !GetAtt ImagesBucket.Arn
+  #     RouteTableIds:
+  #       - !Ref VPCRoutingTable
+  #     ServiceName: !Sub 'com.amazonaws.${AWS::Region}.s3'
+  #     VpcId: !Ref VpcId
+
+
         
 
 
@@ -40,6 +66,12 @@ Resources:
           - !Ref VPCSecurityGroup
         SubnetIds:
           - !Ref VPCSubnet
+      Events:
+        S3Event:
+          Type: S3
+          Properties:
+            Bucket: !Ref ImagesBucket
+            Events: s3:ObjectCreated:Put
 
 
   # Roles ###################################################################################
@@ -54,6 +86,7 @@ Resources:
             Principal:
               Service:
                 - lambda.amazonaws.com
+                - s3.amazonaws.com
         Version: '2012-10-17'
       Path: /
       Policies:
@@ -76,9 +109,26 @@ Resources:
                   - rekognition:DetectText
                 Effect: Allow
                 Resource: "*"
+              - Action:
+                  - ec2:CreateNetworkInterface
+                  - ec2:DescribeNetworkInterfaces
+                  - ec2:DeleteNetworkInterface
+                  - ec2:DescribeInstances
+                  - ec2:AttachNetworkInterface
+                Effect: Allow
+                Resource: "*"
             Version: '2012-10-17'
           PolicyName: TextRecognitionLambdaPolicy
       RoleName: TextRecognitionLambdaRole
+
+  InvokeLambdaPermission:
+    Type: "AWS::Lambda::Permission"
+    Properties:
+      FunctionName: !GetAtt PhotoIndexLambda.Arn
+      Action: lambda:InvokeFunction
+      Principal: s3.amazonaws.com
+      SourceArn: !GetAtt ImagesBucket.Arn
+
 
 
 # Outputs:

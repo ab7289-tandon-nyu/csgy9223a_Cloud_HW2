@@ -8,5 +8,5 @@ s3_prefix = "csgy9223a-hw2-photo-stack"
 region = "us-east-1"
 confirm_changeset = true
 capabilities = "CAPABILITY_IAM CAPABILITY_NAMED_IAM"
-parameter_overrides = "VPCSecurityGroup=\"sg-036e720631eabe997\" VPCSubnet=\"subnet-07e49d6e243a9d766\""
+parameter_overrides = "VPCSecurityGroup=\"sg-036e720631eabe997\" VPCSubnet=\"subnet-07e49d6e243a9d766\" VPCRoutingTable=\"rtb-03db14cb4cf7dae6c\" VpcId=\"vpc-06dddc2a059e86959\""
 image_repositories = []
