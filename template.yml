@@ -13,13 +13,18 @@ Parameters:
 
 
 Resources:
-  # S3 Bucket
+  # S3 Bucket#############################################################################
   ImagesBucket:
     Type: 'AWS::S3::Bucket'
-    
+    Properties:
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: s3:ObjectCreated:Put
+            Function: !GetAtt PhotoIndexLambda.Arn
+        
 
 
-  # Lambdas
+  # Lambdas ################################################################################
   PhotoIndexLambda:
     Type: 'AWS::Serverless::Function'
     Properties:
@@ -29,11 +34,51 @@ Resources:
       Description: A lambda function to index photos uploaded to our s3 bucket in OpenSearch
       MemorySize: 128
       Timeout: 30
+      Role: !GetAtt TextRecognitionLambdaRole.Arn
       VpcConfig:
         SecurityGroupIds:
-          - !Ref VPCSecurigyGroup
+          - !Ref VPCSecurityGroup
         SubnetIds:
           - !Ref VPCSubnet
+
+
+  # Roles ###################################################################################
+  # Role for Lambda
+  TextRecognitionLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+        Version: '2012-10-17'
+      Path: /
+      Policies:
+        - PolicyDocument:
+            Statement:
+              - Action:
+                  - logs:CreateLogGroup
+                  - logs:DescribeLogGroups
+                  - logs:CreateLogStream
+                  - logs:DescribeLogStreams
+                  - logs:PutLogEvents
+                Effect: Allow
+                Resource:
+                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*'
+              - Action:
+                  - 's3:GetObject'
+                Effect: Allow
+                Resource: 'arn:aws:s3:::*'
+              - Action:
+                  - rekognition:DetectText
+                Effect: Allow
+                Resource: "*"
+            Version: '2012-10-17'
+          PolicyName: TextRecognitionLambdaPolicy
+      RoleName: TextRecognitionLambdaRole
 
 
 # Outputs:
