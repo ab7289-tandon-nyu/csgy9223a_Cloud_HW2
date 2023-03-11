@@ -5,8 +5,12 @@ Description: CloudFormation stack for the Intelligent Photo Album
 # Globals:
   # TODO
 
-# Parameters:
-
+Parameters:
+  VPCSecurityGroup:
+    Type: String
+  VPCSubnet:
+    Type: String
+    
 
 # Resources:
   # TODO
