@@ -10,44 +10,12 @@ Parameters:
     Type: String
   VPCSubnet:
     Type: String
-  VPCRoutingTable:
-    Type: String
-  VpcId:
-    Type: String
 
 
 Resources:
   # S3 Bucket#############################################################################
   ImagesBucket:
-    Type: 'AWS::S3::Bucket'
-    # Properties:
-    #   NotificationConfiguration:
-    #     LambdaConfigurations:
-    #       - Event: s3:ObjectCreated:Put
-    #         Function: !GetAtt PhotoIndexLambda.Arn
-
-  # S3VpcAccessPoint:
-  #   Type: 'AWS::S3::AccessPoint'
-  #   Properties:
-  #     Bucket: !Ref ImagesBucket
-  # S3GatewayEndpoint:
-  #   Type: AWS::EC2::VPCEndpoint
-  #   Properties:
-  #     PolicyDocument:
-  #       Version: 2012-10-17
-  #       Statement:
-  #         - Effect: Allow
-  #           Principal: "*"
-  #           Action:
-  #             - s3:GetObject
-  #           Resource: !GetAtt ImagesBucket.Arn
-  #     RouteTableIds:
-  #       - !Ref VPCRoutingTable
-  #     ServiceName: !Sub 'com.amazonaws.${AWS::Region}.s3'
-  #     VpcId: !Ref VpcId
-
-
-        
+    Type: 'AWS::S3::Bucket'        
 
 
   # Lambdas ################################################################################
@@ -121,6 +89,8 @@ Resources:
           PolicyName: TextRecognitionLambdaPolicy
       RoleName: TextRecognitionLambdaRole
 
+
+# PERMISSIONS ################################################################3333#######
   InvokeLambdaPermission:
     Type: "AWS::Lambda::Permission"
     Properties:
