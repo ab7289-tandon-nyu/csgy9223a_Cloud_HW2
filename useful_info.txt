@@ -7,3 +7,8 @@ Security Group: sg-036e720631eabe997
 CloudFormation_
 StackName: csgy9223a-hw2-photo-stack
 ARN: arn:aws:cloudformation:us-east-1:979351636556:stack/csgy9223a-hw2-photo-stack/ff5bbb20-c028-11ed-92cf-0ec3ec06a8bf
+
+
+
+OpenSearch Domain:
+https://vpc-csgy-9332a-hw2-photos-qndp6xmr6xhsptth25dxsx2lra.us-east-1.es.amazonaws.com
