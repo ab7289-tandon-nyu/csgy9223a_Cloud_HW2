@@ -116,11 +116,14 @@ def send_to_os(rekog_labels: list[str], custom_labels: Optional[list], key: str,
     """
     Indexes the document in OpenSearch
     """
+    if custom_labels is not None:
+        rekog_labels.extend(custom_labels)
+        
     payload: dict = dict(
         objectKey=key,
         bucket=bucket,
         createdTimestamp=datetime.now().isoformat(),
-        labels=[*rekog_labels, *custom_labels]
+        labels=rekog_labels
     )
 
     logger.debug("payload for os: {}".format(payload))
