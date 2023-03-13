@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 ## ENVIRONMENT ##################################################
-OS_DOMAIN: str = "https://vpc-csgy-9332a-hw2-photos-qndp6xmr6xhsptth25dxsx2lra.us-east-1.es.amazonaws.com"
+OS_DOMAIN: str = "https://search-csgy9223a-hw2-photos-chf7ynmu25dt2tn6ygb7j4jhhm.us-east-1.es.amazonaws.com"
 INDEX: str = "photos"
 ENDPOINT: str = "_doc"
 
