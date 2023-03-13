@@ -1,6 +1,7 @@
 import logging
 import os
 import boto3
+from datetime import datetime
 from botocore.exceptions import ClientError
 
 from typing import Optional
@@ -12,6 +13,8 @@ logger.setLevel(logging.DEBUG)
 OS_DOMAIN: str = "https://vpc-csgy-9332a-hw2-photos-qndp6xmr6xhsptth25dxsx2lra.us-east-1.es.amazonaws.com"
 INDEX: str = "photos"
 ENDPOINT: str = "_doc"
+
+OS_URL: str = OS_DOMAIN + "/" + INDEX + "/" + ENDPOINT
 
 
 class RekognitionImage:
@@ -65,6 +68,7 @@ class RekognitionImage:
         else:
             return labels
 
+
 def get_head_object(bucket_name: str, key: str) -> Optional[list]:
     """
     uses the boto3 s3 client to retrieve the head object of an s3 object
@@ -77,6 +81,8 @@ def get_head_object(bucket_name: str, key: str) -> Optional[list]:
     s3 = boto3.client("s3")
     response: dict = s3.head_object(Bucket=bucket_name, Key=key)
     print(f"Received head_object response: {response}")
+    metadata: dict = response.get("Metadata")
+    return metadata.get("x-amz-meta-customLabels")
 
 
 def process_image(image_event: dict, api_client) -> None:
@@ -89,22 +95,38 @@ def process_image(image_event: dict, api_client) -> None:
         logger.error("s3 object of PUT event was empty %s", image_event)
         return
 
-    bucket_name: str = s3_object["bucket"]["name"] # name
+    bucket_name: str = s3_object["bucket"]["name"]  # name
     object_key: str = s3_object["object"]["key"]
 
-    get_head_object(bucket_name, object_key)
+    custom_labels: Optional[list] = get_head_object(bucket_name, object_key)
 
     image_object = boto3.resource("s3").Object(
         bucket_name, object_key
     )
-
     logger.debug("s3 image object: {}".format(image_object))
+
     rek_image = RekognitionImage.from_bucket(image_object, api_client)
-    logger.debug("Rekognition Image Object: %s", rek_image)
-    detect_labels(rek_image)
+    logger.debug("Rekognition Image Object: {}".format(rek_image))
+    rekog_labels: list = detect_labels(rek_image)
+
+    send_to_os(rekog_labels, custom_labels, object_key, bucket_name)
 
 
-def detect_labels(image_object: RekognitionImage):
+def send_to_os(rekog_labels: list[str], custom_labels: Optional[list], key: str, bucket: str):
+    """
+    Indexes the document in OpenSearch
+    """
+    payload: dict = dict(
+        objectKey=key,
+        bucket=bucket,
+        createdTimestamp=datetime.now().isoformat(),
+        labels=[*rekog_labels, *custom_labels]
+    )
+
+    logger.debug("payload for os: {}".format(payload))
+
+
+def detect_labels(image_object: RekognitionImage) -> list:
     """
     Takes an s3 image object and passes it to rekognition
     for label testing
@@ -114,14 +136,13 @@ def detect_labels(image_object: RekognitionImage):
 
     logger.info("begin label detection")
     labels: list = image_object.detect_labels(5)
-    print(f"Labels: {labels}")
+    logger.info("Rekognition Labels: {}".format(labels))
+    return list([label.get("Name") for label in labels])
 
 
 def lambda_handler(event: dict, context: dict) -> dict:
     logger.debug("Received s3 event: {}".format(event))
     logger.debug("Received context object: {}".format(context))
-
-    url: str = OS_DOMAIN + "/" + INDEX + "/" + ENDPOINT
 
     rekognition_client = boto3.client("rekognition")
 
