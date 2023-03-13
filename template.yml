@@ -36,8 +36,8 @@ Resources:
       CodeUri: src/lambdas/PhotoIndexLambda/
       Handler: lambda_function.lambda_handler
       Description: A lambda function to index photos uploaded to our s3 bucket in OpenSearch
-      MemorySize: 128
-      Timeout: 300
+      MemorySize: 256
+      Timeout: 120
       Role: !GetAtt TextRecognitionLambdaRole.Arn
       VpcConfig:
         SecurityGroupIds:

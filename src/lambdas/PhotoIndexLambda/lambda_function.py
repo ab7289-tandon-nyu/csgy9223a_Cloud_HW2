@@ -1,6 +1,8 @@
 import logging
 import os
 import boto3
+import requests
+from requests.auth import HTTPBasicAuth
 from datetime import datetime
 from botocore.exceptions import ClientError
 
@@ -118,7 +120,7 @@ def send_to_os(rekog_labels: list[str], custom_labels: Optional[list], key: str,
     """
     if custom_labels is not None:
         rekog_labels.extend(custom_labels)
-        
+
     payload: dict = dict(
         objectKey=key,
         bucket=bucket,
@@ -126,7 +128,14 @@ def send_to_os(rekog_labels: list[str], custom_labels: Optional[list], key: str,
         labels=rekog_labels
     )
 
-    logger.debug("payload for os: {}".format(payload))
+    basic_auth = HTTPBasicAuth(
+        os.getenv("OpenSearch_User"), os.getenv("OpenSearch_Passwored"))
+    headers: dict = {"Content-Type": "application/json"}
+
+    r = requests.post(OS_URL, json=payload, headers=headers, auth=basic_auth)
+    r.raise_for_status()
+    logger.debug(
+        "{} returned from POST {} - json: {}".format(r.status_code, OS_URL, payload))
 
 
 def detect_labels(image_object: RekognitionImage) -> list:
@@ -152,8 +161,3 @@ def lambda_handler(event: dict, context: dict) -> dict:
     images_array: list = event.get("Records")
     for image in images_array:
         process_image(image, rekognition_client)
-    # TODO
-    # Get Object from S3
-    # pass object to Rekognition
-    # create OpenSearch document from the Rekognition response
-    # POST to OpenSearch cluster
