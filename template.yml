@@ -6,20 +6,11 @@ Description: CloudFormation stack for the Intelligent Photo Album
   # TODO
 
 Parameters:
-  VPCSecurityGroup:
-    Type: String
-  VPCSubnetPrivate:
-    Type: String
-  VPCSubnetOpen:
-    Type: String
-  # VPCId:
-  #   Type: String
-  # VPCRouteTable:
-  #   Type: String
   OpenSearchUser:
     Type: String
   OpenSearchPassword:
     Type: String
+    NoEcho: true
 
 
 Resources:
@@ -39,12 +30,6 @@ Resources:
       MemorySize: 256
       Timeout: 120
       Role: !GetAtt TextRecognitionLambdaRole.Arn
-      VpcConfig:
-        SecurityGroupIds:
-          - !Ref VPCSecurityGroup
-        SubnetIds:
-          - !Ref VPCSubnetPrivate
-          - !Ref VPCSubnetOpen
       Events:
         S3Event:
           Type: S3
@@ -66,12 +51,6 @@ Resources:
       MemorySize: 128
       Timeout: 30
       Role: !GetAtt LexLambdaRole.Arn
-      VpcConfig:
-        SecurityGroupIds:
-          - !Ref VPCSecurityGroup
-        SubnetIds:
-          - !Ref VPCSubnetPrivate
-          - !Ref VPCSubnetOpen
       Environment:
         Variables:
           OpenSearch_User: !Ref OpenSearchUser
@@ -92,8 +71,6 @@ Resources:
             Principal:
               Service:
                 - lambda.amazonaws.com
-                - s3.amazonaws.com
-                - rekognition.amazonaws.com
         Version: '2012-10-17'
       Path: /
       Policies:
@@ -113,15 +90,7 @@ Resources:
                 Effect: Allow
                 Resource: 'arn:aws:s3:::*'
               - Action:
-                  - rekognition:*
-                Effect: Allow
-                Resource: "*"
-              - Action:
-                  - ec2:CreateNetworkInterface
-                  - ec2:DescribeNetworkInterfaces
-                  - ec2:DeleteNetworkInterface
-                  - ec2:DescribeInstances
-                  - ec2:AttachNetworkInterface
+                  - rekognition:detectLabels
                 Effect: Allow
                 Resource: "*"
             Version: '2012-10-17'
@@ -138,7 +107,7 @@ Resources:
             Principal: 
               Service:
                 - lambda.amazonaws.com
-            Version: '2012-10-17'
+        Version: '2012-10-17'
       Path: /
       ManagedPolicyArns:
         # access to run lex bot
@@ -147,19 +116,6 @@ Resources:
         - "arn:aws:iam::aws:policy/CloudWatchLambdaInsightsExecutionRolePolicy"
         # access to perform searches against OpenSearch
         - "arn:aws:iam::aws:policy/AmazonOpenSearchServiceReadOnlyAccess"
-      Policies:
-        - PolicyDocument:
-            Version: '2012-10-17'
-            Statement:
-              - Action:
-                  - ec2:CreateNetworkInterface
-                  - ec2:DescribeNetworkInterfaces
-                  - ec2:DeleteNetworkInterface
-                  - ec2:DescribeInstances
-                  - ec2:AttachNetworkInterface
-                Effect: Allow
-                Resource: "*"
-          PolicyName: LambdaEc2AccessPolicy
 
 
 
@@ -173,21 +129,50 @@ Resources:
       SourceArn: !GetAtt ImagesBucket.Arn
 
 
-# VPC Endpoints
-  RekognitionVpcEndpoint:
-    Type: "AWS::EC2::VPCEndpoint"
-    Properties:
-      PrivateDnsEnabled: True
-      SecurityGroupIds:
-        - !Ref VPCSecurityGroup
-      SubnetIds:
-        - !Ref VPCSubnetPrivate
-      ServiceName: com.amazonaws.us-east-1.rekognition
-      VpcEndpointType: Interface
-      VpcId: "vpc-06dddc2a059e86959"
-
-
+# OpenSearch Domain ###################################################################
+  # OpenSearchServiceDomain:
+  #   Type: AWS::OpenSearchService::Domain
+  #   Properties:
+  #     DomainName: "csgy-9223a-hw2-photos"
+  #     EngineVersion: "OpenSearch_2.5"
+  #     ClusterConfig:
+  #       DedicatedMasterEnabled: False
+  #       InstanceCount: 1
+  #       InstanceType: "t3.small.search"
+  #       ZoneAwarenessEnabled: false
+  #       # ZoneAwarenessConfig:
+  #       #   AvailabilityZoneCount: 1
+  #     EBSOptions:
+  #       EBSEnabled: true
+  #       Iops: 0
+  #       VolumeSize: 10
+  #       VolumeType: "gp3"
+  #     AccessPolicies:
+  #       Version: "2012-10-17"
+  #       Statement:
+  #         - Effect: Allow
+  #           Principal:
+  #             AWS: "*"
+  #           Action: "es:*"
+  #           Resource: "*"
+  #     AdvancedSecurityOptions:
+  #       Enabled: true
+  #       InternalUserDatabaseEnabled: true
+  #       MasterUserOptions:
+  #         MasterUserName: !Ref OpenSearchUser
+  #         MasterUserPassword: !Ref OpenSearchPassword
+  #     DomainEndpointOptions:
+  #       EnforceHTTPS: true
+  #     EncryptionAtRestOptions:
+  #       Enabled: true
+  #     NodeToNodeEncryptionOptions:
+  #       Enabled: true
+      
 
 
 # Outputs:
-  # TODO
+#   DomainEndpoint:
+#     Value:
+#       'Fn::GetAtt':
+#         - OpenSearchServiceDomain
+#         - DomainEndpoint
