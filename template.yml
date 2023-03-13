@@ -8,7 +8,9 @@ Description: CloudFormation stack for the Intelligent Photo Album
 Parameters:
   VPCSecurityGroup:
     Type: String
-  VPCSubnet:
+  VPCSubnetPrivate:
+    Type: String
+  VPCSubnetOpen:
     Type: String
   # VPCId:
   #   Type: String
@@ -41,7 +43,8 @@ Resources:
         SecurityGroupIds:
           - !Ref VPCSecurityGroup
         SubnetIds:
-          - !Ref VPCSubnet
+          - !Ref VPCSubnetPrivate
+          - !Ref VPCSubnetOpen
       Events:
         S3Event:
           Type: S3
@@ -122,7 +125,7 @@ Resources:
       SecurityGroupIds:
         - !Ref VPCSecurityGroup
       SubnetIds:
-        - !Ref VPCSubnet
+        - !Ref VPCSubnetPrivate
       ServiceName: com.amazonaws.us-east-1.rekognition
       VpcEndpointType: Interface
       VpcId: "vpc-06dddc2a059e86959"

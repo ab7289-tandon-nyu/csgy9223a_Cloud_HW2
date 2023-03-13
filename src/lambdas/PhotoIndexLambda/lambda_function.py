@@ -3,7 +3,7 @@ import os
 import boto3
 from botocore.exceptions import ClientError
 
-# from rekognition_objects import RekognitionLabel
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -65,6 +65,19 @@ class RekognitionImage:
         else:
             return labels
 
+def get_head_object(bucket_name: str, key: str) -> Optional[list]:
+    """
+    uses the boto3 s3 client to retrieve the head object of an s3 object
+    and returns the x-amz-meta-customLabels if it exists
+
+    :param bucket_name: the name of the bucket
+    :param key: the key of the object in the bucket
+    :returns: an array of custom labels or nothing
+    """
+    s3 = boto3.client("s3")
+    response: dict = s3.head_object(Bucket=bucket_name, Key=key)
+    print(f"Received head_object response: {response}")
+
 
 def process_image(image_event: dict, api_client) -> None:
     """
@@ -79,9 +92,12 @@ def process_image(image_event: dict, api_client) -> None:
     bucket_name: str = s3_object["bucket"]["name"] # name
     object_key: str = s3_object["object"]["key"]
 
+    get_head_object(bucket_name, object_key)
+
     image_object = boto3.resource("s3").Object(
         bucket_name, object_key
     )
+
     logger.debug("s3 image object: {}".format(image_object))
     rek_image = RekognitionImage.from_bucket(image_object, api_client)
     logger.debug("Rekognition Image Object: %s", rek_image)
