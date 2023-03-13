@@ -56,6 +56,28 @@ Resources:
           OpenSearch_User: !Ref OpenSearchUser
           OpenSearch_Passwored: !Ref OpenSearchPassword
 
+  PhotoSearchLambda:
+    Type: "AWS::Serverless::Function"
+    Properties:
+      Runtime: python3.9
+      CodeUri: src/lambdas/PhotoSearchLambda/
+      Handler: lambda_function.lambda_handler
+      Description: A lambda function to query lex and search for relevant photos in OpenSearch
+      MemorySize: 128
+      Timeout: 30
+      Role: !GetAtt LexLambdaRole.Arn
+      VpcConfig:
+        SecurityGroupIds:
+          - !Ref VPCSecurityGroup
+        SubnetIds:
+          - !Ref VPCSubnetPrivate
+          - !Ref VPCSubnetOpen
+      Environment:
+        Variables:
+          OpenSearch_User: !Ref OpenSearchUser
+          OpenSearch_Password: !Ref OpenSearchPassword
+      # TODO add Events section for API Gateway
+
 
 
   # Roles ###################################################################################
@@ -105,6 +127,40 @@ Resources:
             Version: '2012-10-17'
           PolicyName: TextRecognitionLambdaPolicy
       RoleName: TextRecognitionLambdaRole
+
+  LexLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal: 
+              Service:
+                - lambda.amazonaws.com
+            Version: '2012-10-17'
+      Path: /
+      ManagedPolicyArns:
+        # access to run lex bot
+        - "arn:aws:iam::aws:policy/AmazonLexRunBotsOnly"
+        # access to create logs in CloudWatch
+        - "arn:aws:iam::aws:policy/CloudWatchLambdaInsightsExecutionRolePolicy"
+        # access to perform searches against OpenSearch
+        - "arn:aws:iam::aws:policy/AmazonOpenSearchServiceReadOnlyAccess"
+      Policies:
+        - PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                  - ec2:CreateNetworkInterface
+                  - ec2:DescribeNetworkInterfaces
+                  - ec2:DeleteNetworkInterface
+                  - ec2:DescribeInstances
+                  - ec2:AttachNetworkInterface
+                Effect: Allow
+                Resource: "*"
+          PolicyName: LambdaEc2AccessPolicy
+
 
 
 # PERMISSIONS ################################################################3333#######
