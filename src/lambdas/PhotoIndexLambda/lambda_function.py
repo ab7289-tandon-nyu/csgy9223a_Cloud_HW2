@@ -152,7 +152,7 @@ def detect_labels(image_object: RekognitionImage) -> list:
     return list([label.get("Name") for label in labels])
 
 
-def lambda_handler(event: dict, context: dict) -> dict:
+def lambda_handler(event: dict, context: dict) -> None:
     logger.debug("Received s3 event: {}".format(event))
     logger.debug("Received context object: {}".format(context))
 
