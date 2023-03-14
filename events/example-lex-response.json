@@ -1,0 +1,108 @@
+{
+    "messages": [
+        {
+            "content": "Okay, I see that you want to search for planes and trains",
+            "contentType": "PlainText"
+        }
+    ],
+    "sessionState": {
+        "dialogAction": {
+            "type": "ConfirmIntent"
+        },
+        "intent": {
+            "name": "SearchIntent",
+            "slots": {
+                "SearchTerms": {
+                    "value": {
+                        "originalValue": "planes and trains",
+                        "interpretedValue": "planes and trains",
+                        "resolvedValues": [
+                            "plane and trains and planes",
+                            "trains and planes and trains and planes"
+                        ]
+                    },
+                    "shape": "List",
+                    "values": [
+                        {
+                            "value": {
+                                "originalValue": "planes",
+                                "interpretedValue": "planes",
+                                "resolvedValues": [
+                                    "plane",
+                                    "trains and planes"
+                                ]
+                            },
+                            "shape": "Scalar"
+                        },
+                        {
+                            "value": {
+                                "originalValue": "trains",
+                                "interpretedValue": "trains",
+                                "resolvedValues": [
+                                    "trains and planes"
+                                ]
+                            },
+                            "shape": "Scalar"
+                        }
+                    ]
+                }
+            },
+            "state": "InProgress",
+            "confirmationState": "None"
+        },
+        "sessionAttributes": {},
+        "originatingRequestId": "52a3265e-bc65-442f-baa3-f34709bd5497"
+    },
+    "interpretations": [
+        {
+            "intent": {
+                "name": "SearchIntent",
+                "slots": {
+                    "SearchTerms": {
+                        "value": {
+                            "originalValue": "planes and trains",
+                            "interpretedValue": "planes and trains",
+                            "resolvedValues": [
+                                "plane and trains and planes",
+                                "trains and planes and trains and planes"
+                            ]
+                        },
+                        "shape": "List",
+                        "values": [
+                            {
+                                "value": {
+                                    "originalValue": "planes",
+                                    "interpretedValue": "planes",
+                                    "resolvedValues": [
+                                        "plane",
+                                        "trains and planes"
+                                    ]
+                                },
+                                "shape": "Scalar"
+                            },
+                            {
+                                "value": {
+                                    "originalValue": "trains",
+                                    "interpretedValue": "trains",
+                                    "resolvedValues": [
+                                        "trains and planes"
+                                    ]
+                                },
+                                "shape": "Scalar"
+                            }
+                        ]
+                    }
+                },
+                "state": "InProgress",
+                "confirmationState": "None"
+            }
+        },
+        {
+            "intent": {
+                "name": "FallbackIntent",
+                "slots": {}
+            }
+        }
+    ],
+    "sessionId": "979351636556595"
+}

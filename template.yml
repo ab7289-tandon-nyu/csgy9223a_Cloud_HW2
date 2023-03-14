@@ -122,7 +122,7 @@ Resources:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
-        Version: "2012-10-07"
+        Version: '2012-10-17'
         Statement:
           - Effect: Allow
             Principal:
@@ -144,6 +144,110 @@ Resources:
       Action: lambda:InvokeFunction
       Principal: s3.amazonaws.com
       SourceArn: !GetAtt ImagesBucket.Arn
+
+
+
+# Lex Bot ###############################################################################
+  SearchPhotosBot:
+    Type: AWS::Lex::Bot
+    Properties:
+      Name: "PhotoSearchBot"
+      RoleArn: !GetAtt LexRuntimeRole.Arn
+      IdleSessionTTLInSeconds: 120
+      AutoBuildBotLocales: true
+      DataPrivacy:
+        ChildDirected: false
+      BotLocales:
+        - LocaleId: "en_US"
+          NluConfidenceThreshold: 0.40
+          VoiceSettings:
+            VoiceId: "Ivy"
+          SlotTypes:
+            - Name: "SearchTermValues"
+              Description: "different objects that a user can search for"
+              ValueSelectionSetting:
+                ResolutionStrategy: ORIGINAL_VALUE
+              SlotTypeValues:
+                - SampleValue:
+                    Value: plane
+                - SampleValue:
+                    Value: trucks
+                - SampleValue:
+                    Value: birds
+                - SampleValue:
+                    Value: trains and planes
+                - SampleValue:
+                    Value: animals
+          Intents:
+            - Name: "SearchIntent"
+              Description: "Intent to search for photos"
+              SampleUtterances:
+                - Utterance: "{SearchTerms}"
+                - Utterance: "show me {SearchTerms}"
+                - Utterance: "I would like to see pictures of {SearchTerms}"
+                - Utterance: "I want to see {SearchTerms}"
+              IntentClosingSetting:
+                ClosingResponse:
+                  MessageGroupsList:
+                    - Message:
+                        PlainTextMessage:
+                          Value: "Ok, let me search our Intelligent Photo Album!"
+              IntentConfirmationSetting:
+                PromptSpecification:
+                  MaxRetries: 3
+                  MessageGroupsList:
+                    - Message:
+                        PlainTextMessage:
+                          Value: "Okay, I see that you want to search for {SearchTerms}"
+                DeclinationResponse:
+                  MessageGroupsList:
+                    - Message:
+                        PlainTextMessage:
+                          Value: "Ok, I won't search for images."
+              SlotPriorities:
+                - Priority: 1
+                  SlotName: SearchTerms
+              Slots:
+                - Name: "SearchTerms"
+                  Description: "query subject of what the user would like to see images of"
+                  MultipleValuesSetting:
+                    AllowMultipleValues: true
+                  SlotTypeName: "SearchTermValues"
+                  ValueElicitationSetting:
+                    SlotConstraint: "Required"
+                    PromptSpecification:
+                      AllowInterrupt: false
+                      MaxRetries: 3
+                      MessageGroupsList:
+                        - Message:
+                            PlainTextMessage:
+                              Value: "What kinds of images would you like to see?"
+            - Name: "FallbackIntent"
+              Description: "Default intent when no other matches"
+              ParentIntentSignature: "AMAZON.FallbackIntent"
+
+  TemplateBotVersionWithCFN:
+    Type: AWS::Lex::BotVersion
+    Properties:
+      BotId: !Ref SearchPhotosBot
+      BotVersionLocaleSpecification:
+        - BotVersionLocaleDetails:
+            SourceBotVersion: DRAFT
+          LocaleId: en_US
+      Description: Search Photos Version
+
+  BotAliasWithCFN:
+    Type: AWS::Lex::BotAlias
+    Properties:
+      BotId: !Ref SearchPhotosBot
+      BotAliasName: "SearchPhotosVersion1Alias"
+      BotVersion: !GetAtt TemplateBotVersionWithCFN.BotVersion
+      SentimentAnalysisSettings:
+        DetectSentiment: false
+
+                            
+
+          
 
 
 # OpenSearch Domain ###################################################################
