@@ -49,13 +49,19 @@ Resources:
       Handler: lambda_function.lambda_handler
       Description: A lambda function to query lex and search for relevant photos in OpenSearch
       MemorySize: 128
-      Timeout: 30
+      Timeout: 3
       Role: !GetAtt LexLambdaRole.Arn
       Environment:
         Variables:
           OpenSearch_User: !Ref OpenSearchUser
           OpenSearch_Password: !Ref OpenSearchPassword
-      # TODO add Events section for API Gateway
+      # Events:
+      #   APIEvent:
+      #     Type: Api
+      #     Properties:
+      #       Path: /search
+      #       Method: GET
+      #       RestApiId: !Ref ApiGateway
 
 
 
@@ -71,6 +77,7 @@ Resources:
             Principal:
               Service:
                 - lambda.amazonaws.com
+                - apigateway.amazonaws.com
         Version: '2012-10-17'
       Path: /
       Policies:
@@ -93,6 +100,11 @@ Resources:
                   - rekognition:detectLabels
                 Effect: Allow
                 Resource: "*"
+              - Action:
+                  - lambda:InvokeFunction
+                Effect: Allow
+                Resource: "*"
+                  # - !GetAtt PhotoIndexLambda.Arn
             Version: '2012-10-17'
           PolicyName: TextRecognitionLambdaPolicy
       RoleName: TextRecognitionLambdaRole
@@ -107,6 +119,7 @@ Resources:
             Principal: 
               Service:
                 - lambda.amazonaws.com
+                - apigateway.amazonaws.com
         Version: '2012-10-17'
       Path: /
       ManagedPolicyArns:
@@ -116,6 +129,16 @@ Resources:
         - "arn:aws:iam::aws:policy/CloudWatchLambdaInsightsExecutionRolePolicy"
         # access to perform searches against OpenSearch
         - "arn:aws:iam::aws:policy/AmazonOpenSearchServiceReadOnlyAccess"
+      Policies:
+        - PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Action:
+                  - lambda:InvokeFunction
+                Effect: Allow
+                Resource: "*"
+                  # - !GetAtt PhotoSearchLambda.Arn
+          PolicyName: "PhotoSearchLambdaPolicy"
 
   # Runtime Role for Lex
   LexRuntimeRole:
@@ -128,12 +151,36 @@ Resources:
             Principal:
               Service:
                 - lexv2.amazonaws.com
+                - lambda.amazonaws.com
             Action:
               - sts:AssumeRole
       Path: /
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/AmazonLexRunBotsOnly"
 
+  ApiGatewayS3Role:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - apigateway.amazonaws.com
+            Action: 
+              - 'sts:AssumeRole'
+      Policies:
+        - PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: 's3:Put*'
+                Resource: 'arn:aws:s3:::*'
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: "*"
+          PolicyName: ApiGatewayS3RolePolicy
 
 
 # PERMISSIONS ################################################################3333#######
@@ -145,7 +192,21 @@ Resources:
       Principal: s3.amazonaws.com
       SourceArn: !GetAtt ImagesBucket.Arn
 
+  # ApiInvokeLambdaIndexPermission:
+  #   Type: "AWS::Lambda::Permission"
+  #   Properties:
+  #     FunctionName: !GetAtt PhotoIndexLambda.Arn
+  #     Action: lambda:InvokeFunction
+  #     Principal: apigateway.amazonaws.com
+  #     SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:/${ApiGateway}/${UploadResource}/${PutMethod}"
 
+  # ApiInvokeLambdaSearchPermission:
+  #   Type: "AWS::Lambda::Permission"
+  #   Properties:
+  #     FunctionName: !GetAtt PhotoSearchLambda.Arn
+  #     Action: lambda:InvokeFunction
+  #     Principal: apigateway.amazonaws.com
+  #     SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:/${ApiGateway}/${SearchResource}/${GetMethod}"
 
 # Lex Bot ###############################################################################
   SearchPhotosBot:
@@ -246,9 +307,74 @@ Resources:
         DetectSentiment: false
 
                             
+# API Gateway ########################################################################
+  ApiGateway:
+    Type: AWS::Serverless::Api
+    Properties:
+      Description: API Gateway for our photo search requests
+      StageName: prod
+      # DefinitionUri: ./api/swagger.yaml
+      DefinitionBody:
+        'Fn::Transform':
+          Name: 'AWS::Include'
+          Parameters:
+            Location: './api/swagger.yaml'
+      OpenApiVersion: '2.0'
+      # EndpointConfiguration:
+      #   Type: REGIONAL
 
-          
+  # ApiResource:
+  #   Type: AWS::ApiGateway::Resource
+  #   Properties:
+  #     RestApiId: !Ref ApiGateway
+  #     ParentId: !GetAtt ApiGateway.RootResourceId
+  #     PathPart: '{proxy+}'
 
+  # UploadResource:
+  #   Type: AWS::ApiGateway::Resource
+  #   Properties:
+  #     RestApiId: !Ref ApiGateway
+  #     ParentId: !Ref ApiResource
+  #     PathPart: '/upload'
+
+  # SearchResource:
+  #   Type: AWS::ApiGateway::Resource
+  #   Properties:
+  #     RestApiId: !Ref ApiGateway
+  #     ParentId: !Ref ApiResource
+  #     PathPart: '/search'
+
+  # PutMethod:
+  #   Type: AWS::ApiGateway::Method
+  #   Properties:
+  #     RestApiId: !Ref ApiGateway
+  #     ResourceId: !Ref UploadResource
+  #     HttpMethod: PUT
+  #     AuthorizationType: NONE
+      # Integration:
+      #   Type: AWS_PROXY
+      #   IntegrationHttpMethod: PUT
+      #   Credentials: !GetAtt ApiGatewayS3Role.Arn
+      #   Uri: !Sub 'arn:aws:apigateway:${AWS::Region}/s3:path/${ImagesBucket}'
+        # Uri: !Sub 'arn:aws:apigateway:${AWS::Region}/lambda:path/2015-03-31/functions/${PhotoIndexLambda}/invocations'
+      
+  # GetMethod:
+  #   Type: AWS::ApiGateway::Method
+  #   Properties:
+  #     RestApiId: !Ref ApiGateway
+  #     ResourceId: !Ref SearchResource
+  #     HttpMethod: GET
+  #     AuthorizationType: NONE
+  #     Integration:
+  #       Type: MOCK
+        # IntegrationHttpMethod: GET
+        # Uri: !Sub 'arn:aws:apigateway:${AWS::Region}/lambda:path/2015-03-31/functions/${PhotoSearchLambda}/invocations'
+      
+  # ApiGatewayDeployment:
+  #   Type: AWS::ApiGateway::Deployment
+  #   Properties:
+  #     RestApiId: !Ref ApiGateway
+  #     StageName: Prod
 
 # OpenSearch Domain ###################################################################
   # OpenSearchServiceDomain:
@@ -291,7 +417,9 @@ Resources:
       
 
 
-# Outputs:
+Outputs:
+  apiGatewayUrl:
+    Value: !Sub https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod
 #   DomainEndpoint:
 #     Value:
 #       'Fn::GetAtt':

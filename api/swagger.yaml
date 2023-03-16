@@ -36,6 +36,16 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+      x-amazon-apigateway-integration:
+        responses:
+          default: "200"
+        redentials:
+          Fn::Sub: '${ApiGatewayS3Role.Arn}'
+        passthroughBehaviour: "when_no_match"
+        httpMethod: POST
+        type: AWS_PROXY
+        uri:
+          Fn::Sub: 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PhotoSearchLambda.Arn}/invocations'
   /upload:
     put:
       summary: photo upload method
@@ -61,6 +71,16 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+      x-amazon-apigateway-integration:
+        responses:
+          default: "200"
+        credentials: 
+          Fn::Sub: '${ApiGatewayS3Role.Arn}'
+        uri: 
+          Fn::Sub: 'arn:aws:apigateway:${AWS::Region}:s3:path/${ImagesBucket}'
+        passthroughBehaviour: "when_no_match"
+        httpMethod: PUT
+        type: AWS
 definitions:
   SearchResponse:
     type: object
