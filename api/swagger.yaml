@@ -46,6 +46,8 @@ paths:
             statusCode: "500"
         credentials:
           Fn::Sub: '${ApiGatewayS3Role.Arn}'
+        # requestParameters:
+        #   integration.request.querystring.q: "method.request.querystring.q"
         passthroughBehaviour: "when_no_match"
         httpMethod: POST
         type: AWS_PROXY
@@ -104,13 +106,15 @@ paths:
         - name: Content-Type
           in: header
           required: false
-          schema:
-            type: string
+          type: string
         - name: item
           in: path
           required: true
-          schema:
-            type: string
+          type: string
+        - name: x-amz-meta-customLabels
+          in: header
+          required: false
+          type: string
       responses:
         '200':
           description: S3 PUT operation response
@@ -137,6 +141,7 @@ paths:
         requestParameters:
           integration.request.path.item: "method.request.path.item"
           integration.request.header.Content-Type: "method.request.header.Content-Type"
+          integration.request.header.x-amz-meta-customLabels: "method.request.header.x-amz-meta-customLabels"
         uri: 
           Fn::Sub: 'arn:aws:apigateway:${AWS::Region}:s3:path/${ImagesBucket}/{item}'
         passthroughBehaviour: "when_no_match"
@@ -163,7 +168,7 @@ paths:
           default:
             statusCode: "200"
             responseParameters:
-              method.response.header.Access-Control-Allow-Headers: "'Content-Type'"
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type, x-amz-meta-customLabels'"
               method.response.header.Access-Control-Allow-Methods: "'*'"
               method.response.header.Access-Control-Allow-Origin: "'*'"
             responseTemplates:

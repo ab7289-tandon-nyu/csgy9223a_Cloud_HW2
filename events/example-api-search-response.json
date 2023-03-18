@@ -1,0 +1,128 @@
+{
+    "resource": "/search",
+    "path": "/search",
+    "httpMethod": "GET",
+    "headers": {
+        "Accept": "*/*",
+        "Accept-Encoding": "gzip, deflate, br",
+        "CloudFront-Forwarded-Proto": "https",
+        "CloudFront-Is-Desktop-Viewer": "true",
+        "CloudFront-Is-Mobile-Viewer": "false",
+        "CloudFront-Is-SmartTV-Viewer": "false",
+        "CloudFront-Is-Tablet-Viewer": "false",
+        "CloudFront-Viewer-ASN": "701",
+        "CloudFront-Viewer-Country": "US",
+        "Host": "5k47lpugge.execute-api.us-east-1.amazonaws.com",
+        "Postman-Token": "6811c6bb-c41d-4bc3-ae32-06e3bfcdf45d",
+        "User-Agent": "PostmanRuntime/7.31.1",
+        "Via": "1.1 779925c9c68a6d4d8c35b729b0516a76.cloudfront.net (CloudFront)",
+        "X-Amz-Cf-Id": "C93hVNyy9_RcaU7ItBNjM5pUQhUw-kfNGIubXgE7WdIYGknJCb3_Fw==",
+        "x-amz-date": "20230318T174506Z",
+        "X-Amzn-Trace-Id": "Root=1-6415f8a2-26d4395f2886afca459f35cf",
+        "X-Forwarded-For": "71.167.83.70, 130.176.116.155",
+        "X-Forwarded-Port": "443",
+        "X-Forwarded-Proto": "https"
+    },
+    "multiValueHeaders": {
+        "Accept": [
+            "*/*"
+        ],
+        "Accept-Encoding": [
+            "gzip, deflate, br"
+        ],
+        "CloudFront-Forwarded-Proto": [
+            "https"
+        ],
+        "CloudFront-Is-Desktop-Viewer": [
+            "true"
+        ],
+        "CloudFront-Is-Mobile-Viewer": [
+            "false"
+        ],
+        "CloudFront-Is-SmartTV-Viewer": [
+            "false"
+        ],
+        "CloudFront-Is-Tablet-Viewer": [
+            "false"
+        ],
+        "CloudFront-Viewer-ASN": [
+            "701"
+        ],
+        "CloudFront-Viewer-Country": [
+            "US"
+        ],
+        "Host": [
+            "5k47lpugge.execute-api.us-east-1.amazonaws.com"
+        ],
+        "Postman-Token": [
+            "6811c6bb-c41d-4bc3-ae32-06e3bfcdf45d"
+        ],
+        "User-Agent": [
+            "PostmanRuntime/7.31.1"
+        ],
+        "Via": [
+            "1.1 779925c9c68a6d4d8c35b729b0516a76.cloudfront.net (CloudFront)"
+        ],
+        "X-Amz-Cf-Id": [
+            "C93hVNyy9_RcaU7ItBNjM5pUQhUw-kfNGIubXgE7WdIYGknJCb3_Fw=="
+        ],
+        "x-amz-date": [
+            "20230318T174506Z"
+        ],
+        "X-Amzn-Trace-Id": [
+            "Root=1-6415f8a2-26d4395f2886afca459f35cf"
+        ],
+        "X-Forwarded-For": [
+            "71.167.83.70, 130.176.116.155"
+        ],
+        "X-Forwarded-Port": [
+            "443"
+        ],
+        "X-Forwarded-Proto": [
+            "https"
+        ]
+    },
+    "queryStringParameters": {
+        "q": "bird"
+    },
+    "multiValueQueryStringParameters": {
+        "q": [
+            "bird"
+        ]
+    },
+    "pathParameters": None,
+    "stageVariables": None,
+    "requestContext": {
+        "resourceId": "jduu4n",
+        "resourcePath": "/search",
+        "operationName": "searchPhotos",
+        "httpMethod": "GET",
+        "extendedRequestId": "B_PJXE32oAMFYEw=",
+        "requestTime": "18/Mar/2023:17:45:06 +0000",
+        "path": "/prod/search",
+        "accountId": "979351636556",
+        "protocol": "HTTP/1.1",
+        "stage": "prod",
+        "domainPrefix": "5k47lpugge",
+        "requestTimeEpoch": 1679161506025,
+        "requestId": "e64c35ee-2148-4332-8753-a4a6edbe081a",
+        "identity": {
+            "cognitoIdentityPoolId": None,
+            "accountId": None,
+            "cognitoIdentityId": None,
+            "caller": None,
+            "sourceIp": "71.167.83.70",
+            "principalOrgId": None,
+            "accessKey": None,
+            "cognitoAuthenticationType": None,
+            "cognitoAuthenticationProvider": None,
+            "userArn": None,
+            "userAgent": "PostmanRuntime/7.31.1",
+            "user": None
+        },
+        "domainName": "5k47lpugge.execute-api.us-east-1.amazonaws.com",
+        "apiId": "5k47lpugge"
+    },
+    "body": None,
+    "isBase64Encoded": False
+}

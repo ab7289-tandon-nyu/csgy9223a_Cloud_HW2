@@ -149,7 +149,15 @@ Resources:
                   - lambda:InvokeFunction
                 Effect: Allow
                 Resource: "*"
-                  # - !GetAtt PhotoSearchLambda.Arn
+              - Action:
+                  - logs:CreateLogGroup
+                  - logs:DescribeLogGroups
+                  - logs:CreateLogStream
+                  - logs:DescribeLogStreams
+                  - logs:PutLogEvents
+                Effect: Allow
+                Resource:
+                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*'
           PolicyName: "PhotoSearchLambdaPolicy"
 
   # Runtime Role for Lex
