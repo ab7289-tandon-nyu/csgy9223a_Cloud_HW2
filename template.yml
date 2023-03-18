@@ -330,7 +330,10 @@ Resources:
             Location: './api/swagger.yaml'
       OpenApiVersion: '2.0'
       Cors:
-        AllowMethods: "'PUT, GET'"
+        AllowMethods:
+          - PUT
+          - GET
+          - OPTIONS
         AllowOrigin: "*"
       MethodSettings:
         - LoggingLevel: INFO
@@ -339,58 +342,12 @@ Resources:
       # EndpointConfiguration:
       #   Type: REGIONAL
 
+  # Sets a Global Cloudwatch Role on our API so that we can log to Cloudwatch
   ApiCloudWatchRoleArn:
     Type: AWS::ApiGateway::Account
     DependsOn: ApiGateway
     Properties:
       CloudWatchRoleArn: !GetAtt ApiGatewayS3Role.Arn
-
-  # ApiResource:
-  #   Type: AWS::ApiGateway::Resource
-  #   Properties:
-  #     RestApiId: !Ref ApiGateway
-  #     ParentId: !GetAtt ApiGateway.RootResourceId
-  #     PathPart: '{proxy+}'
-
-  # UploadResource:
-  #   Type: AWS::ApiGateway::Resource
-  #   Properties:
-  #     RestApiId: !Ref ApiGateway
-  #     ParentId: !Ref ApiResource
-  #     PathPart: '/upload'
-
-  # SearchResource:
-  #   Type: AWS::ApiGateway::Resource
-  #   Properties:
-  #     RestApiId: !Ref ApiGateway
-  #     ParentId: !Ref ApiResource
-  #     PathPart: '/search'
-
-  # PutMethod:
-  #   Type: AWS::ApiGateway::Method
-  #   Properties:
-  #     RestApiId: !Ref ApiGateway
-  #     ResourceId: !Ref UploadResource
-  #     HttpMethod: PUT
-  #     AuthorizationType: NONE
-      # Integration:
-      #   Type: AWS_PROXY
-      #   IntegrationHttpMethod: PUT
-      #   Credentials: !GetAtt ApiGatewayS3Role.Arn
-      #   Uri: !Sub 'arn:aws:apigateway:${AWS::Region}/s3:path/${ImagesBucket}'
-        # Uri: !Sub 'arn:aws:apigateway:${AWS::Region}/lambda:path/2015-03-31/functions/${PhotoIndexLambda}/invocations'
-      
-  # GetMethod:
-  #   Type: AWS::ApiGateway::Method
-  #   Properties:
-  #     RestApiId: !Ref ApiGateway
-  #     ResourceId: !Ref SearchResource
-  #     HttpMethod: GET
-  #     AuthorizationType: NONE
-  #     Integration:
-  #       Type: MOCK
-        # IntegrationHttpMethod: GET
-        # Uri: !Sub 'arn:aws:apigateway:${AWS::Region}/lambda:path/2015-03-31/functions/${PhotoSearchLambda}/invocations'
 
 
 # OpenSearch Domain ###################################################################
