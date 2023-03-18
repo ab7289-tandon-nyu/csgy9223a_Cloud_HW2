@@ -16,7 +16,20 @@ Parameters:
 Resources:
   # S3 Bucket#############################################################################
   ImagesBucket:
-    Type: 'AWS::S3::Bucket'        
+    Type: 'AWS::S3::Bucket'   
+    Properties:
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - '*'
+            AllowedMethods:
+              - PUT
+            AllowedOrigins:
+              - '*'
+            ExposedHeaders:
+              - Date
+            Id: myCORSRuleId1
+            MaxAge: 3600  
 
 
   # Lambdas ################################################################################

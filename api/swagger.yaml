@@ -88,7 +88,7 @@ paths:
               type: "string"
             Access-Control-Allow-Origin:
               type: "string"
-  /upload:
+  /upload/{item}:
     put:
       summary: photo upload method
       description: |
@@ -104,11 +104,13 @@ paths:
         - name: Content-Type
           in: header
           required: false
-          type: string
+          schema:
+            type: string
         - name: item
           in: path
           required: true
-          type: string
+          schema:
+            type: string
       responses:
         '200':
           description: S3 PUT operation response
@@ -133,8 +135,8 @@ paths:
         credentials: 
           Fn::Sub: '${ApiGatewayS3Role.Arn}'
         requestParameters:
-          integration.request.path.bucket: method.request.path.folder
-          integration.request.header.Content-Type: method.request.header.Content-Type
+          integration.request.path.item: "method.request.path.item"
+          integration.request.header.Content-Type: "method.request.header.Content-Type"
         uri: 
           Fn::Sub: 'arn:aws:apigateway:${AWS::Region}:s3:path/${ImagesBucket}/{item}'
         passthroughBehaviour: "when_no_match"
