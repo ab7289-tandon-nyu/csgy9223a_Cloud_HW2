@@ -38,14 +38,56 @@ paths:
             $ref: '#/definitions/Error'
       x-amazon-apigateway-integration:
         responses:
-          default: "200"
-        redentials:
+          default: 
+            statusCode: "200"
+          "BAD.*":
+            statusCode: "400"
+          "INT.*":
+            statusCode: "500"
+        credentials:
           Fn::Sub: '${ApiGatewayS3Role.Arn}'
         passthroughBehaviour: "when_no_match"
         httpMethod: POST
         type: AWS_PROXY
         uri:
           Fn::Sub: 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PhotoSearchLambda.Arn}/invocations'
+    options:
+      summary: CORS Support
+      description: |
+        Enable CORS by returning correct headers
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      tags:
+        - CORS
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: |
+            {
+              "statusCode": 200
+            }
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type'"
+              method.response.header.Access-Control-Allow-Methods: "'*'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: |
+                {}
+      responses:
+        '200':
+          description: Default response from CORS method
+          headers:
+            Access-Control-Allow-Headers:
+              type: "string"
+            Access-Control-Allow-Methods:
+              type: "string"
+            Access-Control-Allow-Origin:
+              type: "string"
   /upload:
     put:
       summary: photo upload method
@@ -73,7 +115,12 @@ paths:
             $ref: '#/definitions/Error'
       x-amazon-apigateway-integration:
         responses:
-          default: "200"
+          default: 
+            statusCode: "200"
+          "BAD.*":
+            statusCode: "400"
+          "INT.*":
+            statusCode: "500"
         credentials: 
           Fn::Sub: '${ApiGatewayS3Role.Arn}'
         uri: 
@@ -81,6 +128,43 @@ paths:
         passthroughBehaviour: "when_no_match"
         httpMethod: PUT
         type: AWS
+    options:
+      summary: CORS Support
+      description: |
+        Enable CORS by returning correct headers
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      tags:
+        - CORS
+      x-amazon-apigateway-integration:
+        type: mock
+        requestTemplates:
+          application/json: |
+            {
+              "statusCode": 200
+            }
+        responses:
+          default:
+            statusCode: "200"
+            responseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type'"
+              method.response.header.Access-Control-Allow-Methods: "'*'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+            responseTemplates:
+              application/json: |
+                {}
+      responses:
+        '200':
+          description: Default response from CORS method
+          headers:
+            Access-Control-Allow-Headers:
+              type: "string"
+            Access-Control-Allow-Methods:
+              type: "string"
+            Access-Control-Allow-Origin:
+              type: "string"
 definitions:
   SearchResponse:
     type: object

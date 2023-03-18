@@ -55,13 +55,13 @@ Resources:
         Variables:
           OpenSearch_User: !Ref OpenSearchUser
           OpenSearch_Password: !Ref OpenSearchPassword
-      # Events:
-      #   APIEvent:
-      #     Type: Api
-      #     Properties:
-      #       Path: /search
-      #       Method: GET
-      #       RestApiId: !Ref ApiGateway
+      Events:
+        APIEvent:
+          Type: Api
+          Properties:
+            Path: /search
+            Method: GET
+            RestApiId: !Ref ApiGateway
 
 
 
@@ -104,7 +104,6 @@ Resources:
                   - lambda:InvokeFunction
                 Effect: Allow
                 Resource: "*"
-                  # - !GetAtt PhotoIndexLambda.Arn
             Version: '2012-10-17'
           PolicyName: TextRecognitionLambdaPolicy
       RoleName: TextRecognitionLambdaRole
@@ -168,6 +167,8 @@ Resources:
             Principal:
               Service:
                 - apigateway.amazonaws.com
+                - lambda.amazonaws.com
+                # - s3.amazonaws.com
             Action: 
               - 'sts:AssumeRole'
       Policies:
@@ -175,12 +176,21 @@ Resources:
             Version: '2012-10-17'
             Statement:
               - Effect: Allow
-                Action: 's3:Put*'
-                Resource: 'arn:aws:s3:::*'
+                # Action: 's3:Put*'
+                Action: 's3:*'
+                # Resource: 'arn:aws:s3:::*'
+                Resource: '*'
               - Effect: Allow
                 Action: lambda:InvokeFunction
                 Resource: "*"
+              - Effect: Allow
+                Action:
+                  - 'kms:Decrypt'
+                  - 'kms:ReEncryptFrom'
+                Resource: "*"
           PolicyName: ApiGatewayS3RolePolicy
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
 
 
 # PERMISSIONS ################################################################3333#######
@@ -313,15 +323,27 @@ Resources:
     Properties:
       Description: API Gateway for our photo search requests
       StageName: prod
-      # DefinitionUri: ./api/swagger.yaml
       DefinitionBody:
         'Fn::Transform':
           Name: 'AWS::Include'
           Parameters:
             Location: './api/swagger.yaml'
       OpenApiVersion: '2.0'
+      Cors:
+        AllowMethods: "'PUT, GET'"
+        AllowOrigin: "*"
+      MethodSettings:
+        - LoggingLevel: INFO
+          ResourcePath: '/*'
+          HttpMethod: '*'
       # EndpointConfiguration:
       #   Type: REGIONAL
+
+  ApiCloudWatchRoleArn:
+    Type: AWS::ApiGateway::Account
+    DependsOn: ApiGateway
+    Properties:
+      CloudWatchRoleArn: !GetAtt ApiGatewayS3Role.Arn
 
   # ApiResource:
   #   Type: AWS::ApiGateway::Resource
@@ -369,12 +391,7 @@ Resources:
   #       Type: MOCK
         # IntegrationHttpMethod: GET
         # Uri: !Sub 'arn:aws:apigateway:${AWS::Region}/lambda:path/2015-03-31/functions/${PhotoSearchLambda}/invocations'
-      
-  # ApiGatewayDeployment:
-  #   Type: AWS::ApiGateway::Deployment
-  #   Properties:
-  #     RestApiId: !Ref ApiGateway
-  #     StageName: Prod
+
 
 # OpenSearch Domain ###################################################################
   # OpenSearchServiceDomain:
@@ -419,7 +436,7 @@ Resources:
 
 Outputs:
   apiGatewayUrl:
-    Value: !Sub https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/Prod
+    Value: !Sub https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod
 #   DomainEndpoint:
 #     Value:
 #       'Fn::GetAtt':
