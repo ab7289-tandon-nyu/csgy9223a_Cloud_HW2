@@ -13,13 +13,13 @@
         "CloudFront-Viewer-ASN": "701",
         "CloudFront-Viewer-Country": "US",
         "Host": "5k47lpugge.execute-api.us-east-1.amazonaws.com",
-        "Postman-Token": "6811c6bb-c41d-4bc3-ae32-06e3bfcdf45d",
+        "Postman-Token": "eeb605a0-5480-4219-ada1-9a965cff3d6d",
         "User-Agent": "PostmanRuntime/7.31.1",
-        "Via": "1.1 779925c9c68a6d4d8c35b729b0516a76.cloudfront.net (CloudFront)",
-        "X-Amz-Cf-Id": "C93hVNyy9_RcaU7ItBNjM5pUQhUw-kfNGIubXgE7WdIYGknJCb3_Fw==",
-        "x-amz-date": "20230318T174506Z",
-        "X-Amzn-Trace-Id": "Root=1-6415f8a2-26d4395f2886afca459f35cf",
-        "X-Forwarded-For": "71.167.83.70, 130.176.116.155",
+        "Via": "1.1 1322f71561d45d48a5334ac75abd0c2e.cloudfront.net (CloudFront)",
+        "X-Amz-Cf-Id": "eK1jPQ9u4VnU081kYQjNqYob4wqpLucqekUeXz6kjbFjZ2xxAPWQBw==",
+        "x-amz-date": "20230318T175106Z",
+        "X-Amzn-Trace-Id": "Root=1-6415fa0a-7d5282964106bda306fa4cdd",
+        "X-Forwarded-For": "71.167.83.70, 130.176.116.151",
         "X-Forwarded-Port": "443",
         "X-Forwarded-Proto": "https"
     },
@@ -55,25 +55,25 @@
             "5k47lpugge.execute-api.us-east-1.amazonaws.com"
         ],
         "Postman-Token": [
-            "6811c6bb-c41d-4bc3-ae32-06e3bfcdf45d"
+            "eeb605a0-5480-4219-ada1-9a965cff3d6d"
         ],
         "User-Agent": [
             "PostmanRuntime/7.31.1"
         ],
         "Via": [
-            "1.1 779925c9c68a6d4d8c35b729b0516a76.cloudfront.net (CloudFront)"
+            "1.1 1322f71561d45d48a5334ac75abd0c2e.cloudfront.net (CloudFront)"
         ],
         "X-Amz-Cf-Id": [
-            "C93hVNyy9_RcaU7ItBNjM5pUQhUw-kfNGIubXgE7WdIYGknJCb3_Fw=="
+            "eK1jPQ9u4VnU081kYQjNqYob4wqpLucqekUeXz6kjbFjZ2xxAPWQBw=="
         ],
         "x-amz-date": [
-            "20230318T174506Z"
+            "20230318T175106Z"
         ],
         "X-Amzn-Trace-Id": [
-            "Root=1-6415f8a2-26d4395f2886afca459f35cf"
+            "Root=1-6415fa0a-7d5282964106bda306fa4cdd"
         ],
         "X-Forwarded-For": [
-            "71.167.83.70, 130.176.116.155"
+            "71.167.83.70, 130.176.116.151"
         ],
         "X-Forwarded-Port": [
             "443"
@@ -83,11 +83,11 @@
         ]
     },
     "queryStringParameters": {
-        "q": "bird"
+        "q": "I would like to see images of birds"
     },
     "multiValueQueryStringParameters": {
         "q": [
-            "bird"
+            "I would like to see images of birds"
         ]
     },
     "pathParameters": None,
@@ -97,15 +97,15 @@
         "resourcePath": "/search",
         "operationName": "searchPhotos",
         "httpMethod": "GET",
-        "extendedRequestId": "B_PJXE32oAMFYEw=",
-        "requestTime": "18/Mar/2023:17:45:06 +0000",
+        "extendedRequestId": "B_QBqHtvoAMFdwA=",
+        "requestTime": "18/Mar/2023:17:51:06 +0000",
         "path": "/prod/search",
         "accountId": "979351636556",
         "protocol": "HTTP/1.1",
         "stage": "prod",
         "domainPrefix": "5k47lpugge",
-        "requestTimeEpoch": 1679161506025,
-        "requestId": "e64c35ee-2148-4332-8753-a4a6edbe081a",
+        "requestTimeEpoch": 1679161866383,
+        "requestId": "b6793503-e7ae-4a82-a608-9c8456625e75",
         "identity": {
             "cognitoIdentityPoolId": None,
             "accountId": None,

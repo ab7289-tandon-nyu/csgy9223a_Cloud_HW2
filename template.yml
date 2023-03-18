@@ -62,12 +62,14 @@ Resources:
       Handler: lambda_function.lambda_handler
       Description: A lambda function to query lex and search for relevant photos in OpenSearch
       MemorySize: 128
-      Timeout: 3
+      Timeout: 30
       Role: !GetAtt LexLambdaRole.Arn
       Environment:
         Variables:
           OpenSearch_User: !Ref OpenSearchUser
           OpenSearch_Password: !Ref OpenSearchPassword
+          LexBotId: !GetAtt SearchPhotosBot.Id
+          LexBotAliasId: !GetAtt BotAliasWithCFN.BotAliasId
       Events:
         APIEvent:
           Type: Api
@@ -278,24 +280,6 @@ Resources:
                 - Utterance: "show me {SearchTerms}"
                 - Utterance: "I would like to see pictures of {SearchTerms}"
                 - Utterance: "I want to see {SearchTerms}"
-              IntentClosingSetting:
-                ClosingResponse:
-                  MessageGroupsList:
-                    - Message:
-                        PlainTextMessage:
-                          Value: "Ok, let me search our Intelligent Photo Album!"
-              IntentConfirmationSetting:
-                PromptSpecification:
-                  MaxRetries: 3
-                  MessageGroupsList:
-                    - Message:
-                        PlainTextMessage:
-                          Value: "Okay, I see that you want to search for {SearchTerms}"
-                DeclinationResponse:
-                  MessageGroupsList:
-                    - Message:
-                        PlainTextMessage:
-                          Value: "Ok, I won't search for images."
               SlotPriorities:
                 - Priority: 1
                   SlotName: SearchTerms
@@ -336,6 +320,10 @@ Resources:
       BotVersion: !GetAtt TemplateBotVersionWithCFN.BotVersion
       SentimentAnalysisSettings:
         DetectSentiment: false
+      BotAliasLocaleSettings:
+        - BotAliasLocaleSetting:
+            Enabled: true
+          LocaleId: en_US
 
                             
 # API Gateway ########################################################################
@@ -420,3 +408,8 @@ Outputs:
 #       'Fn::GetAtt':
 #         - OpenSearchServiceDomain
 #         - DomainEndpoint
+  LexBotVersion:
+    Value: !GetAtt SearchPhotosBot.Id
+  LexBotAliasId:
+    Value: !GetAtt BotAliasWithCFN.BotAliasId
+  

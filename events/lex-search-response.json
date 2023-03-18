@@ -1,0 +1,105 @@
+{
+    "ResponseMetadata": {
+        "RequestId": "d40d7f32-f9be-46ad-990b-073a00aeadaf",
+        "HTTPStatusCode": 200,
+        "HTTPHeaders": {
+            "x-amzn-requestid": "d40d7f32-f9be-46ad-990b-073a00aeadaf",
+            "strict-transport-security": "max-age=31536000; includeSubDomains",
+            "x-content-type-options": "nosniff",
+            "date": "Sat, 18 Mar 2023 18:27:33 GMT",
+            "content-type": "application/json",
+            "content-length": "1216"
+        },
+        "RetryAttempts": 0
+    },
+    "messages": [
+        {
+            "content": "Okay, I see that you want to search for hawks and geese",
+            "contentType": "PlainText"
+        }
+    ],
+    "sessionState": {
+        "dialogAction": {
+            "type": "ConfirmIntent"
+        },
+        "intent": {
+            "name": "SearchIntent",
+            "slots": {
+                "SearchTerms": {
+                    "value": {
+                        "originalValue": "hawks and geese",
+                        "interpretedValue": "hawks and geese",
+                        "resolvedValues": []
+                    },
+                    "shape": "List",
+                    "values": [
+                        {
+                            "value": {
+                                "originalValue": "hawks",
+                                "interpretedValue": "hawks",
+                                "resolvedValues": []
+                            },
+                            "shape": "Scalar"
+                        },
+                        {
+                            "value": {
+                                "originalValue": "geese",
+                                "interpretedValue": "geese",
+                                "resolvedValues": []
+                            },
+                            "shape": "Scalar"
+                        }
+                    ]
+                }
+            },
+            "state": "InProgress",
+            "confirmationState": "None"
+        },
+        "sessionAttributes": {},
+        "originatingRequestId": "d40d7f32-f9be-46ad-990b-073a00aeadaf"
+    },
+    "interpretations": [
+        {
+            "intent": {
+                "name": "SearchIntent",
+                "slots": {
+                    "SearchTerms": {
+                        "value": {
+                            "originalValue": "hawks and geese",
+                            "interpretedValue": "hawks and geese",
+                            "resolvedValues": []
+                        },
+                        "shape": "List",
+                        "values": [
+                            {
+                                "value": {
+                                    "originalValue": "hawks",
+                                    "interpretedValue": "hawks",
+                                    "resolvedValues": []
+                                },
+                                "shape": "Scalar"
+                            },
+                            {
+                                "value": {
+                                    "originalValue": "geese",
+                                    "interpretedValue": "geese",
+                                    "resolvedValues": []
+                                },
+                                "shape": "Scalar"
+                            }
+                        ]
+                    }
+                },
+                "state": "InProgress",
+                "confirmationState": "None"
+            }
+        },
+        {
+            "intent": {
+                "name": "FallbackIntent",
+                "slots": {}
+            }
+        }
+    ],
+    "sessionId": "testsession"
+}
