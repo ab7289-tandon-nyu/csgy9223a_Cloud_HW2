@@ -7,6 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+
 def disambiguate(query: str) -> list:
     """
     Utilizes our Lex bot to parse out what the user was asking
@@ -27,10 +28,13 @@ def disambiguate(query: str) -> list:
     )
     print(f"Lex response: {response}")
 
+    intent: dict = response['sessionState']['intent']
+    searchSlot: dict = intent['slots']['SearchTerms']
 
-def lambda_handler(event: dict, context: dict) -> None:
-    logger.info("Received search event: {}".format(event))
-    logger.info("Received context object: {}".format(context))
+    return list([slotVal['value']['interpretedValue'] for slotVal in searchSlot['values']])
+
+
+def lambda_handler(event: dict, context: dict) -> dict:
 
     print(f"received event: {event}")
     print(f"received context: {context}")
@@ -41,12 +45,14 @@ def lambda_handler(event: dict, context: dict) -> None:
 
     searchTerms: list = disambiguate(queryString)
 
+    print(f"disambiguated search terms: {searchTerms}")
+
     response: dict = {
         "isBase64Encoded": False,
         "statusCode": 200,
         "headers": {},
         "multiValueHeaders": {},
-        "body": "test body"
+        "body": ",".join(searchTerms)
     }
 
     return response
