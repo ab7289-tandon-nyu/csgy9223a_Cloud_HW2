@@ -16,6 +16,7 @@ Parameters:
 Resources:
   # S3 Bucket#############################################################################
   ImagesBucket:
+    DependsOn: OpenSearchServiceDomain
     Type: 'AWS::S3::Bucket'   
     Properties:
       CorsConfiguration:
@@ -35,6 +36,7 @@ Resources:
   # Lambdas ################################################################################
   PhotoIndexLambda:
     Type: 'AWS::Serverless::Function'
+    DependsOn: OpenSearchServiceDomain
     Properties:
       Runtime: python3.9
       CodeUri: src/lambdas/PhotoIndexLambda/
@@ -56,6 +58,7 @@ Resources:
 
   PhotoSearchLambda:
     Type: "AWS::Serverless::Function"
+    DependsOn: OpenSearchServiceDomain
     Properties:
       Runtime: python3.9
       CodeUri: src/lambdas/PhotoSearchLambda/
@@ -84,6 +87,7 @@ Resources:
   # Role for Lambda
   TextRecognitionLambdaRole:
     Type: AWS::IAM::Role
+    DependsOn: OpenSearchServiceDomain
     Properties:
       AssumeRolePolicyDocument:
         Statement:
@@ -125,6 +129,7 @@ Resources:
 
   LexLambdaRole:
     Type: AWS::IAM::Role
+    DependsOn: OpenSearchServiceDomain
     Properties:
       AssumeRolePolicyDocument:
         Statement:
@@ -165,6 +170,7 @@ Resources:
   # Runtime Role for Lex
   LexRuntimeRole:
     Type: AWS::IAM::Role
+    DependsOn: OpenSearchServiceDomain
     Properties:
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -182,6 +188,7 @@ Resources:
 
   ApiGatewayS3Role:
     Type: AWS::IAM::Role
+    DependsOn: OpenSearchServiceDomain
     Properties:
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -191,7 +198,6 @@ Resources:
               Service:
                 - apigateway.amazonaws.com
                 - lambda.amazonaws.com
-                # - s3.amazonaws.com
             Action: 
               - 'sts:AssumeRole'
       Policies:
@@ -199,9 +205,7 @@ Resources:
             Version: '2012-10-17'
             Statement:
               - Effect: Allow
-                # Action: 's3:Put*'
                 Action: 's3:*'
-                # Resource: 'arn:aws:s3:::*'
                 Resource: '*'
               - Effect: Allow
                 Action: lambda:InvokeFunction
@@ -219,31 +223,19 @@ Resources:
 # PERMISSIONS ################################################################3333#######
   InvokeLambdaPermission:
     Type: "AWS::Lambda::Permission"
+    DependsOn: OpenSearchServiceDomain
     Properties:
       FunctionName: !GetAtt PhotoIndexLambda.Arn
       Action: lambda:InvokeFunction
       Principal: s3.amazonaws.com
       SourceArn: !GetAtt ImagesBucket.Arn
 
-  # ApiInvokeLambdaIndexPermission:
-  #   Type: "AWS::Lambda::Permission"
-  #   Properties:
-  #     FunctionName: !GetAtt PhotoIndexLambda.Arn
-  #     Action: lambda:InvokeFunction
-  #     Principal: apigateway.amazonaws.com
-  #     SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:/${ApiGateway}/${UploadResource}/${PutMethod}"
 
-  # ApiInvokeLambdaSearchPermission:
-  #   Type: "AWS::Lambda::Permission"
-  #   Properties:
-  #     FunctionName: !GetAtt PhotoSearchLambda.Arn
-  #     Action: lambda:InvokeFunction
-  #     Principal: apigateway.amazonaws.com
-  #     SourceArn: !Sub "arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:/${ApiGateway}/${SearchResource}/${GetMethod}"
 
 # Lex Bot ###############################################################################
   SearchPhotosBot:
     Type: AWS::Lex::Bot
+    DependsOn: OpenSearchServiceDomain
     Properties:
       Name: "PhotoSearchBot"
       RoleArn: !GetAtt LexRuntimeRole.Arn
@@ -304,6 +296,7 @@ Resources:
 
   TemplateBotVersionWithCFN:
     Type: AWS::Lex::BotVersion
+    DependsOn: OpenSearchServiceDomain
     Properties:
       BotId: !Ref SearchPhotosBot
       BotVersionLocaleSpecification:
@@ -314,6 +307,7 @@ Resources:
 
   BotAliasWithCFN:
     Type: AWS::Lex::BotAlias
+    DependsOn: OpenSearchServiceDomain
     Properties:
       BotId: !Ref SearchPhotosBot
       BotAliasName: "SearchPhotosVersion1Alias"
@@ -329,6 +323,7 @@ Resources:
 # API Gateway ########################################################################
   ApiGateway:
     Type: AWS::Serverless::Api
+    DependsOn: OpenSearchServiceDomain
     Properties:
       Description: API Gateway for our photo search requests
       StageName: prod
@@ -348,26 +343,35 @@ Resources:
         - LoggingLevel: INFO
           ResourcePath: '/*'
           HttpMethod: '*'
-      # EndpointConfiguration:
-      #   Type: REGIONAL
 
   # Sets a Global Cloudwatch Role on our API so that we can log to Cloudwatch
   ApiCloudWatchRoleArn:
     Type: AWS::ApiGateway::Account
-    DependsOn: ApiGateway
+    DependsOn: 
+      - OpenSearchServiceDomain
+      - ApiGateway
+    # DependsOn: ApiGateway
     Properties:
       CloudWatchRoleArn: !GetAtt ApiGatewayS3Role.Arn
 
 
 # OpenSearch Domain ###################################################################
   OpenSearchServiceDomain:
+    # DependsOn:
+    #   - ApiGateway
+    #   - SearchPhotosBot
+    #   - PhotoSearchLambda
+    #   - PhotoIndexLambda
+    #   - ImagesBucket
+    #   - TemplateBotVersionWithCFN
+    #   - BotAliasWithCFN
     Type: AWS::OpenSearchService::Domain
     Properties:
       DomainName: "csgy-9223a-hw2-photos"
       EngineVersion: "OpenSearch_2.5"
       ClusterConfig:
         DedicatedMasterEnabled: False
-        InstanceCount: 2
+        InstanceCount: 1
         InstanceType: "t3.small.search"
         ZoneAwarenessEnabled: false
         WarmEnabled: false
@@ -379,7 +383,7 @@ Resources:
         EBSEnabled: true
         Iops: 0
         VolumeSize: 10
-        VolumeType: "gp3"
+        VolumeType: "gp2"
       AccessPolicies:
         Version: "2012-10-17"
         Statement:
@@ -446,10 +450,7 @@ Outputs:
   apiGatewayUrl:
     Value: !Sub https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod
   DomainEndpoint:
-    Value:
-      'Fn::GetAtt':
-        - OpenSearchServiceDomain
-        - DomainEndpoint
+    Value: !GetAtt OpenSearchServiceDomain.DomainEndpoint
   LexBotVersion:
     Value: !GetAtt SearchPhotosBot.Id
   LexBotAliasId:
