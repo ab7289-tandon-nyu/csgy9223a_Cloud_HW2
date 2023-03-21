@@ -357,14 +357,6 @@ Resources:
 
 # OpenSearch Domain ###################################################################
   OpenSearchServiceDomain:
-    # DependsOn:
-    #   - ApiGateway
-    #   - SearchPhotosBot
-    #   - PhotoSearchLambda
-    #   - PhotoIndexLambda
-    #   - ImagesBucket
-    #   - TemplateBotVersionWithCFN
-    #   - BotAliasWithCFN
     Type: AWS::OpenSearchService::Domain
     Properties:
       DomainName: "csgy-9223a-hw2-photos"
@@ -375,8 +367,6 @@ Resources:
         InstanceType: "t3.small.search"
         ZoneAwarenessEnabled: false
         WarmEnabled: false
-        # ZoneAwarenessConfig:
-        #   AvailabilityZoneCount: 1
       CognitoOptions:
         Enabled: false
       EBSOptions:
@@ -404,48 +394,10 @@ Resources:
         TLSSecurityPolicy: Policy-Min-TLS-1-0-2019-07
       EncryptionAtRestOptions:
         Enabled: true
-        KmsKeyId: !Ref OpenSearchKey
       NodeToNodeEncryptionOptions:
         Enabled: true
 
-  OpenSearchKey:
-    Type: AWS::KMS::Key
-    Properties:
-      Enabled: true
-      KeyPolicy:
-        Version: 2012-10-17
-        Statement:
-          - Effect: Allow
-            Principal:
-              AWS: "*"
-            Action:
-              - kms:Encrypt
-              - kms:Decrypt
-              - kms:ReEncrypt*
-              - kms:GenerateDataKey*
-              - kms:CreateGrant
-              - kms:DescribeKey
-            Resource: "*"
-            Condition:
-              StringEquals:
-                kms:ViaService: !Sub "es.${AWS::Region}.amazonaws.com"
-                kms:CallerAccount: !Ref AWS::AccountId
-          - Effect: Allow
-            Principal:
-              AWS: !Sub "arn:aws:iam::${AWS::AccountId}:root"
-            Action: "*"
-            Resource: "*"
-          - Effect: Allow
-            Principal:
-              Service: es.amazonaws.com
-            Action:
-              - kms:Describe*
-              - kms:Get*
-              - kms:List*
-            Resource: "*"
       
-
-
 Outputs:
   apiGatewayUrl:
     Value: !Sub https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod
