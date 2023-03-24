@@ -46,8 +46,6 @@ paths:
             statusCode: "500"
         credentials:
           Fn::Sub: '${ApiGatewayS3Role.Arn}'
-        # requestParameters:
-        #   integration.request.querystring.q: "method.request.querystring.q"
         passthroughBehaviour: "when_no_match"
         httpMethod: POST
         type: AWS_PROXY
