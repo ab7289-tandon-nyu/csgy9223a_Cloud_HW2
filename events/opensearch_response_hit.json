@@ -1,0 +1,36 @@
+{
+    "took": 9,
+    "timed_out": False,
+    "_shards": {
+        "total": 5,
+        "successful": 5,
+        "skipped": 0,
+        "failed": 0
+    },
+    "hits": {
+        "total": {
+            "value": 1,
+            "relation": "eq"
+        },
+        "max_score": 0.2876821,
+        "hits": [
+            {
+                "_index": "photos",
+                "_id": "JWd5GYcBbHE9tU59WpNY",
+                "_score": 0.2876821,
+                "_source": {
+                    "objectKey": "Eopsaltria_australis_-_Mogo_Campground.jpg",
+                    "bucket": "csgy9223a-hw2-photo-stack-imagesbucket-1syb13njb7j45",
+                    "createdTimestamp": "2023-03-25T15:53:14.134262",
+                    "labels": [
+                        "Animal",
+                        "Bird",
+                        "Finch",
+                        "Canary",
+                        "Beak"
+                    ]
+                }
+            }
+        ]
+    }
+}
