@@ -7,6 +7,8 @@ import logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
+OS_DOMAIN: str = "https://" + os.getenv("OpenSearch_Domain")
+
 
 def disambiguate(query: str) -> list:
     """

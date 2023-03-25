@@ -2,9 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: CloudFormation stack for the Intelligent Photo Album
 
-# Globals:
-  # TODO
-
 Parameters:
   OpenSearchUser:
     Type: String
@@ -36,7 +33,7 @@ Resources:
   # Lambdas ################################################################################
   PhotoIndexLambda:
     Type: 'AWS::Serverless::Function'
-    DependsOn: OpenSearchServiceDomain
+    # DependsOn: OpenSearchServiceDomain
     Properties:
       Runtime: python3.9
       CodeUri: src/lambdas/PhotoIndexLambda/
@@ -55,10 +52,11 @@ Resources:
         Variables:
           OpenSearch_User: !Ref OpenSearchUser
           OpenSearch_Passwored: !Ref OpenSearchPassword
+          OpenSearch_Domain: !GetAtt OpenSearchServiceDomain.DomainEndpoint
 
   PhotoSearchLambda:
     Type: "AWS::Serverless::Function"
-    DependsOn: OpenSearchServiceDomain
+    # DependsOn: OpenSearchServiceDomain
     Properties:
       Runtime: python3.9
       CodeUri: src/lambdas/PhotoSearchLambda/
@@ -73,6 +71,7 @@ Resources:
           OpenSearch_Password: !Ref OpenSearchPassword
           LexBotId: !GetAtt SearchPhotosBot.Id
           LexBotAliasId: !GetAtt BotAliasWithCFN.BotAliasId
+          OpenSearch_Domain: !GetAtt OpenSearchServiceDomain.DomainEndpoint
       Events:
         APIEvent:
           Type: Api
@@ -343,6 +342,42 @@ Resources:
         - LoggingLevel: INFO
           ResourcePath: '/*'
           HttpMethod: '*'
+
+  ApiDeployment:
+    Type: AWS::ApiGateway::Deployment
+    DependsOn: OpenSearchServiceDomain
+    Properties:
+      RestApiId: !Ref ApiGateway
+
+  ApiKey: 
+    Type: AWS::ApiGateway::ApiKey
+    DependsOn: OpenSearchServiceDomain
+    Properties: 
+      Name: !Join ["", [{"Ref": "AWS::StackName"}, "-apikey"]]
+      Description: "CloudFormation API Key V1"
+      Enabled: true
+  ApiUsagePlan:
+    Type: "AWS::ApiGateway::UsagePlan"
+    DependsOn: OpenSearchServiceDomain
+    Properties:
+      ApiStages: 
+      - ApiId: !Ref ApiGateway
+        Stage: !Ref ApiGateway.Stage    
+      Description: !Join [" ", [{"Ref": "AWS::StackName"}, "usage plan"]]
+      Quota:
+        Limit: 2000
+        Period: MONTH
+      Throttle:
+        BurstLimit: 10
+        RateLimit: 10
+      UsagePlanName: !Join ["", [{"Ref": "AWS::StackName"}, "-usage-plan"]]
+  ApiUsagePlanKey:
+    Type: "AWS::ApiGateway::UsagePlanKey"
+    DependsOn: OpenSearchServiceDomain
+    Properties:
+      KeyId: !Ref ApiKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref ApiUsagePlan
 
   # Sets a Global Cloudwatch Role on our API so that we can log to Cloudwatch
   ApiCloudWatchRoleArn:
