@@ -2,9 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: 'AWS::Serverless-2016-10-31'
 Description: CloudFormation stack for the Intelligent Photo Album
 
-# Globals:
-  # TODO
-
 Parameters:
   OpenSearchUser:
     Type: String
@@ -36,7 +33,7 @@ Resources:
   # Lambdas ################################################################################
   PhotoIndexLambda:
     Type: 'AWS::Serverless::Function'
-    DependsOn: OpenSearchServiceDomain
+    # DependsOn: OpenSearchServiceDomain
     Properties:
       Runtime: python3.9
       CodeUri: src/lambdas/PhotoIndexLambda/
@@ -55,10 +52,11 @@ Resources:
         Variables:
           OpenSearch_User: !Ref OpenSearchUser
           OpenSearch_Passwored: !Ref OpenSearchPassword
+          OpenSearch_Domain: !GetAtt OpenSearchServiceDomain.DomainEndpoint
 
   PhotoSearchLambda:
     Type: "AWS::Serverless::Function"
-    DependsOn: OpenSearchServiceDomain
+    # DependsOn: OpenSearchServiceDomain
     Properties:
       Runtime: python3.9
       CodeUri: src/lambdas/PhotoSearchLambda/
@@ -73,6 +71,7 @@ Resources:
           OpenSearch_Password: !Ref OpenSearchPassword
           LexBotId: !GetAtt SearchPhotosBot.Id
           LexBotAliasId: !GetAtt BotAliasWithCFN.BotAliasId
+          OpenSearch_Domain: !GetAtt OpenSearchServiceDomain.DomainEndpoint
       Events:
         APIEvent:
           Type: Api
@@ -343,14 +342,6 @@ Resources:
         - LoggingLevel: INFO
           ResourcePath: '/*'
           HttpMethod: '*'
-
-  # ApiStage:
-  #   Type: AWS::ApiGateway::Stage
-  #   DependsOn: OpenSearchServiceDomain
-  #   Properties:
-  #     StageName: prod
-  #     RestApiId: !Ref ApiGateway
-  #     DeploymentId: !Ref ApiDeployment
 
   ApiDeployment:
     Type: AWS::ApiGateway::Deployment
