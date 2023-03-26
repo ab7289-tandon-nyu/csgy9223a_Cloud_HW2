@@ -342,6 +342,8 @@ Resources:
         - LoggingLevel: INFO
           ResourcePath: '/*'
           HttpMethod: '*'
+      BinaryMediaTypes:
+        - '*/*'
 
   ApiDeployment:
     Type: AWS::ApiGateway::Deployment
