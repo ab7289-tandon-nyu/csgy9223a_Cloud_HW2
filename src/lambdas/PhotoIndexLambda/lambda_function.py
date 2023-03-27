@@ -114,7 +114,7 @@ def process_image(image_event: dict, api_client) -> None:
     send_to_os(rekog_labels, custom_labels, object_key, bucket_name)
 
 
-def send_to_os(rekog_labels: list[str], custom_labels: Optional[list], key: str, bucket: str):
+def send_to_os(rekog_labels: 'list[str]', custom_labels: Optional[list], key: str, bucket: str):
     """
     Indexes the document in OpenSearch
     """
