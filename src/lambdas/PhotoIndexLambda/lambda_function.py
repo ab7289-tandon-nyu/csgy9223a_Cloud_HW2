@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 ## ENVIRONMENT ##################################################
-OS_DOMAIN: str = "https://search-csgy9223a-hw2-photos-chf7ynmu25dt2tn6ygb7j4jhhm.us-east-1.es.amazonaws.com"
+OS_DOMAIN: str = "https://" + os.getenv("OpenSearch_Domain")
 INDEX: str = "photos"
 ENDPOINT: str = "_doc"
 
