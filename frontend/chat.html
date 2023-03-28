@@ -55,19 +55,31 @@
 
           <div class="masthead clearfix">
             <div class="inner">
-              <h3 class="masthead-brand">Your restaura</h3>
+              <h3 class="masthead-brand">Photo Album</h3>
             </div>
           </div>
 
           <div class="inner">
-            <div class="chat">
-              <div class="messages">
-                <div class="messages-content"></div>
-              </div>
-              <div class="message-box">
-                <textarea type="text" class="message-input" placeholder="Type message..."></textarea>
-              </div>
+            <div class = "input">
+              <p>Drag & drop photos here or <span class="browse">Browse</span></p>
+              <input type="file" class="file" multiple="multiple" accept="image/jpeg, image/png, image/jpg"/>
             </div>
+            <form id="saved-form">
+              <div class="header">
+                <h3>Saved in Server</h3>
+                <button type="submit">Delete</button>
+              </div>
+              <div class="saved"></div>
+            </form>
+        
+            <form id="queued-form">
+              <div class="header">
+                <h3>Queued in Frontend</h3>
+                <button type="submit">Upload</button>
+              </div>
+              <div class="queued"></div>
+            </form>
+           
           </div>
 
         </div>
@@ -93,6 +105,6 @@
     <!-- custom scroll bar -->
     <script src='https://cdnjs.cloudflare.com/ajax/libs/malihu-custom-scrollbar-plugin/3.1.3/jquery.mCustomScrollbar.concat.min.js'></script>
     <!-- chat js -->
-    <script src="./assets/js/chat.js"></script>
+    <script src="./assets/js/album.js"></script>
   </body>
 </html>
