@@ -21,7 +21,7 @@
     <link href="./assets/css/cover.css" rel="stylesheet">
     <link href="./assets/css/main.css" rel="stylesheet">
     <link href="./assets/css/chat.css" rel="stylesheet">
-
+    <link href="./assets/css/album-css.css" rel="stylesheet">
     <!-- api gateway generated sdk -->
     <script src="./assets/js/sdk/lib/axios/dist/axios.standalone.js"></script>
     <script src="./assets/js/sdk/lib/CryptoJS/rollups/hmac-sha256.js"></script>
@@ -60,7 +60,7 @@
           </div>
 
           <div class="inner">
-            <div class = "input">
+            <div class = "input-div">
               <p>Drag & drop photos here or <span class="browse">Browse</span></p>
               <input type="file" class="file" multiple="multiple" accept="image/jpeg, image/png, image/jpg"/>
             </div>
@@ -69,7 +69,7 @@
                 <h3>Saved in Server</h3>
                 <button type="submit">Delete</button>
               </div>
-              <div class="saved"></div>
+              <div class="saved-div"></div>
             </form>
         
             <form id="queued-form">
@@ -77,7 +77,7 @@
                 <h3>Queued in Frontend</h3>
                 <button type="submit">Upload</button>
               </div>
-              <div class="queued"></div>
+              <div class="queued-div"></div>
             </form>
            
           </div>
