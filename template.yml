@@ -29,7 +29,7 @@ Resources:
             Id: myCORSRuleId1
             MaxAge: 3600  
   FEBucket:
-Type: 'AWS::S3::Bucket'
+    Type: 'AWS::S3::Bucket'
 		Properties:
 			AccessControl: PublicRead
 			BucketName: #insert bucket name
