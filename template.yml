@@ -28,7 +28,7 @@ Resources:
               - Date
             Id: myCORSRuleId1
             MaxAge: 3600  
-  FEBucket:
+  febucket:
     Type: 'AWS::S3::Bucket'
     Properties:
       AccessControl: PublicRead
