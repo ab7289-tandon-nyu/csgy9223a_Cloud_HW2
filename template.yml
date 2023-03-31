@@ -32,7 +32,7 @@ Resources:
     Type: 'AWS::S3::Bucket'
     Properties:
       AccessControl: PublicRead
-      BucketName: FeBucket
+      BucketName: febucket
       WebsiteConfiguration:
         IndexDocument: index.html
 
