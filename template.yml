@@ -30,11 +30,11 @@ Resources:
             MaxAge: 3600  
   FEBucket:
     Type: 'AWS::S3::Bucket'
-		Properties:
-			AccessControl: PublicRead
-			BucketName: #insert bucket name
-			WebsiteConfiguration:
-				IndexDocument: index.html
+    Properties:
+      AccessControl: PublicRead
+      BucketName: #insert bucket name
+      WebsiteConfiguration:
+        IndexDocument: index.html
 
 
   # Lambdas ################################################################################
@@ -453,16 +453,16 @@ Outputs:
     Value: !GetAtt BotAliasWithCFN.BotAliasId
   
   WebsiteURL:
-		Value: !GetAtt
-			- FEBucket
-			- WebsiteURL
-		Description: URL for Website Hosted on S3
-	S3BucketSecureURL:
-		Value: !Join
-			- ''
-			- - 'https://'
-				- !GetAtt
-					- FEBucket
-					- DomainName
-		Description: Name of S3 Bucket to hold website content
+    Value: !GetAtt
+      - FEBucket
+      - WebsiteURL
+    Description: URL for Website Hosted on S3
+  S3BucketSecureURL:
+    Value: !Join
+      - ''
+      - - 'https://'
+        - !GetAtt
+          - FEBucket
+          - DomainName
+    Description: Name of S3 Bucket to hold website content
   
