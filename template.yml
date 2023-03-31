@@ -454,7 +454,7 @@ Outputs:
   
   WebsiteURL:
     Value: !GetAtt
-      - FEBucket
+      - febucket
       - WebsiteURL
     Description: URL for Website Hosted on S3
   S3BucketSecureURL:
@@ -462,7 +462,7 @@ Outputs:
       - ''
       - - 'https://'
         - !GetAtt
-          - FEBucket
+          - febucket
           - DomainName
     Description: Name of S3 Bucket to hold website content
   
