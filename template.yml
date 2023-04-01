@@ -44,7 +44,7 @@ Resources:
               - "GET"
               - "OPTIONS"
             AllowedOrigins:
-              - "*"
+              - ""
 
   SiteBucketPolicy:
     Type: 'AWS::S3::BucketPolicy'
