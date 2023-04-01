@@ -27,10 +27,7 @@ Resources:
             AllowedOrigins:
               - "*"
             ExposedHeaders:
-              - Date
               - Access-Control-Allow-Origin
-            Id: myCORSRuleId1
-            MaxAge: 3600
 
   ImagesBucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -63,8 +60,11 @@ Resources:
         CorsRules:
           - AllowedMethods:
               - "GET"
+              - "PUT"
             AllowedOrigins:
               - "*"
+            ExposedHeaders:
+              - Access-Control-Allow-Origin
 
   SiteBucketPolicy:
     Type: "AWS::S3::BucketPolicy"
