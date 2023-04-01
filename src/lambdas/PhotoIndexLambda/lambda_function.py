@@ -161,3 +161,13 @@ def lambda_handler(event: dict, context: dict) -> None:
     images_array: list = event.get("Records")
     for image in images_array:
         process_image(image, rekognition_client)
+
+    response: dict = {
+        "isBase64Encoded": False,
+        "statusCode": 200,
+        "headers": {"Content-Type": "application/json",
+                    'Access-Control-Allow-Origin': '*', },
+        "multiValueHeaders": {},
+        "body": "",
+    }
+    return response
