@@ -83,11 +83,57 @@ function searchPhotos(searchText) {
             }
 
         }).catch(function(result) {
+            var photosDiv = document.getElementById("photos_search_results");
+            photosDiv.innerHTML = "Image not found";
             console.log(result);
         });
 }
 
+function getBase64(file){
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            let encoded = reader.result.replace(/^data:(.*;base64,)?/, '');
+            if (encoded.length % 4 > 0) {
+                encoded += '='.repeat(4 - (encoded.length % 4));
+            }
+            resolve(encoded);
+        };
+        reader.onerror = (error) => reject(error);
+    });
+}
+
 function uploadPhoto() {
+    /*let file = document.getElementById('uploaded_file').files[0];
+    let fileName = file.name;
+    let file_type = file.type;
+    let reader = new FileReader();
+    reader.onload = function() {
+        let arrayBuffer = this.result;
+        let blob = new Blob([new Int8Array(arrayBuffer)], {
+            type: file_type
+        });
+        let blobUrl = URL.createObjectURL(blob);
+        let data = document.getElementById('uploaded_file').files[0];
+        let xhr = new XMLHttpRequest();
+        xhr.withCredentials = true;
+        xhr.addEventListener("readystatechange", function () {
+            if (this.readyState === 4) {
+                console.log(this.responseText);
+                //document.getElementById('uploadText').innerHTML ='Image Uploaded  !!!';
+                //document.getElementById('uploadText').style.display = 'block';
+            }
+        });
+        xhr.withCredentials = false;
+        xhr.open("PUT", "https://3gfggbrwob.execute-api.us-east-1.amazonaws.com/prod/imagesbucket/"+data.name);
+        xhr.setRequestHeader("Content-Type", data.type);
+       
+        xhr.setRequestHeader("x-amz-meta-customLabels", custom_labels.value);
+       
+        xhr.send(file);
+    };
+    reader.readAsArrayBuffer(file);
+    */
     var filePath = (document.getElementById('uploaded_file').value).split("\\");
     var fileName = filePath[filePath.length - 1];
     
@@ -105,17 +151,18 @@ function uploadPhoto() {
     if ((filePath == "") || (!['png', 'jpg', 'jpeg'].includes(fileName.split(".")[1]))) {
         alert("Please upload a valid .png/.jpg/.jpeg file!");
     } else {
-
+        
         var params = {};
         var additionalParams = {
             headers: {
-                'Access-Control-Allow-Origin': '*',
-                'Content-Type': file.type
+                'item': file.name,
+                'Content-Type': file.type,
+                'x-amz-meta-customLabels': custom_labels.value
             }
         };
         
         reader.onload = function (event) {
-            body = btoa(event.target.result);
+             body = btoa(event.target.result);
             console.log('Reader body : ', body);
             return apigClient.uploadItemPut(params, additionalParams)
             .then(function(result) {
@@ -127,4 +174,5 @@ function uploadPhoto() {
         }
         reader.readAsBinaryString(file);
     }
+
 }
