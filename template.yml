@@ -24,7 +24,6 @@ Resources:
             AllowedMethods:
               - PUT
               - GET
-              - OPTIONS
             AllowedOrigins:
               - '*'
             ExposedHeaders:
@@ -42,7 +41,6 @@ Resources:
         CorsRules:
           - AllowedMethods:
               - "GET"
-              - "OPTIONS"
             AllowedOrigins:
               - ""
 
