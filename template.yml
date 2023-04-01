@@ -42,7 +42,7 @@ Resources:
           - AllowedMethods:
               - "GET"
             AllowedOrigins:
-              - ""
+              - "*"
 
   SiteBucketPolicy:
     Type: 'AWS::S3::BucketPolicy'
