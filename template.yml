@@ -14,7 +14,8 @@ Resources:
   # S3 Bucket#############################################################################
   ImagesBucket:
     DependsOn: OpenSearchServiceDomain
-    Type: 'AWS::S3::Bucket'   
+    Type: 'AWS::S3::Bucket'
+    DeletionPolicy: Delete
     Properties:
       CorsConfiguration:
         CorsRules:
@@ -28,11 +29,11 @@ Resources:
               - Date
             Id: myCORSRuleId1
             MaxAge: 3600  
-  febucket:
+  FEBucket:
     Type: 'AWS::S3::Bucket'
     Properties:
       AccessControl: PublicRead
-      #BucketName: febucket
+      ## BucketName: febucket
       WebsiteConfiguration:
         IndexDocument: index.html
 
@@ -40,7 +41,7 @@ Resources:
   # Lambdas ################################################################################
   PhotoIndexLambda:
     Type: 'AWS::Serverless::Function'
-    # DependsOn: OpenSearchServiceDomain
+    DeletionPolicy: Delete
     Properties:
       Runtime: python3.9
       CodeUri: src/lambdas/PhotoIndexLambda/
@@ -63,7 +64,7 @@ Resources:
 
   PhotoSearchLambda:
     Type: "AWS::Serverless::Function"
-    # DependsOn: OpenSearchServiceDomain
+    DeletionPolicy: Delete
     Properties:
       Runtime: python3.9
       CodeUri: src/lambdas/PhotoSearchLambda/
@@ -94,6 +95,7 @@ Resources:
   TextRecognitionLambdaRole:
     Type: AWS::IAM::Role
     DependsOn: OpenSearchServiceDomain
+    DeletionPolicy: Delete
     Properties:
       AssumeRolePolicyDocument:
         Statement:
@@ -136,6 +138,7 @@ Resources:
   LexLambdaRole:
     Type: AWS::IAM::Role
     DependsOn: OpenSearchServiceDomain
+    DeletionPolicy: Delete
     Properties:
       AssumeRolePolicyDocument:
         Statement:
@@ -177,6 +180,7 @@ Resources:
   LexRuntimeRole:
     Type: AWS::IAM::Role
     DependsOn: OpenSearchServiceDomain
+    DeletionPolicy: Delete
     Properties:
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -195,6 +199,7 @@ Resources:
   ApiGatewayS3Role:
     Type: AWS::IAM::Role
     DependsOn: OpenSearchServiceDomain
+    DeletionPolicy: Delete
     Properties:
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
@@ -230,6 +235,7 @@ Resources:
   InvokeLambdaPermission:
     Type: "AWS::Lambda::Permission"
     DependsOn: OpenSearchServiceDomain
+    DeletionPolicy: Delete
     Properties:
       FunctionName: !GetAtt PhotoIndexLambda.Arn
       Action: lambda:InvokeFunction
@@ -242,6 +248,7 @@ Resources:
   SearchPhotosBot:
     Type: AWS::Lex::Bot
     DependsOn: OpenSearchServiceDomain
+    DeletionPolicy: Delete
     Properties:
       Name: "PhotoSearchBot"
       RoleArn: !GetAtt LexRuntimeRole.Arn
@@ -303,6 +310,7 @@ Resources:
   TemplateBotVersionWithCFN:
     Type: AWS::Lex::BotVersion
     DependsOn: OpenSearchServiceDomain
+    DeletionPolicy: Delete
     Properties:
       BotId: !Ref SearchPhotosBot
       BotVersionLocaleSpecification:
@@ -314,6 +322,7 @@ Resources:
   BotAliasWithCFN:
     Type: AWS::Lex::BotAlias
     DependsOn: OpenSearchServiceDomain
+    DeletionPolicy: Delete
     Properties:
       BotId: !Ref SearchPhotosBot
       BotAliasName: "SearchPhotosVersion1Alias"
@@ -330,6 +339,7 @@ Resources:
   ApiGateway:
     Type: AWS::Serverless::Api
     DependsOn: OpenSearchServiceDomain
+    DeletionPolicy: Delete
     Properties:
       Description: API Gateway for our photo search requests
       StageName: prod
@@ -355,12 +365,14 @@ Resources:
   ApiDeployment:
     Type: AWS::ApiGateway::Deployment
     DependsOn: OpenSearchServiceDomain
+    DeletionPolicy: Delete
     Properties:
       RestApiId: !Ref ApiGateway
 
   ApiKey: 
     Type: AWS::ApiGateway::ApiKey
     DependsOn: OpenSearchServiceDomain
+    DeletionPolicy: Delete
     Properties: 
       Name: !Join ["", [{"Ref": "AWS::StackName"}, "-apikey"]]
       Description: "CloudFormation API Key V1"
@@ -368,6 +380,7 @@ Resources:
   ApiUsagePlan:
     Type: "AWS::ApiGateway::UsagePlan"
     DependsOn: OpenSearchServiceDomain
+    DeletionPolicy: Delete
     Properties:
       ApiStages: 
       - ApiId: !Ref ApiGateway
@@ -383,6 +396,7 @@ Resources:
   ApiUsagePlanKey:
     Type: "AWS::ApiGateway::UsagePlanKey"
     DependsOn: OpenSearchServiceDomain
+    DeletionPolicy: Delete
     Properties:
       KeyId: !Ref ApiKey
       KeyType: API_KEY
@@ -391,6 +405,7 @@ Resources:
   # Sets a Global Cloudwatch Role on our API so that we can log to Cloudwatch
   ApiCloudWatchRoleArn:
     Type: AWS::ApiGateway::Account
+    DeletionPolicy: Delete
     DependsOn: 
       - OpenSearchServiceDomain
       - ApiGateway
@@ -402,6 +417,7 @@ Resources:
 # OpenSearch Domain ###################################################################
   OpenSearchServiceDomain:
     Type: AWS::OpenSearchService::Domain
+    DeletionPolicy: Delete
     Properties:
       DomainName: "csgy-9223a-hw2-photos"
       EngineVersion: "OpenSearch_2.5"
@@ -453,16 +469,12 @@ Outputs:
     Value: !GetAtt BotAliasWithCFN.BotAliasId
   
   WebsiteURL:
-    Value: !GetAtt
-      - febucket
-      - WebsiteURL
+    Value: !GetAtt FEBucket.WebsiteURL
     Description: URL for Website Hosted on S3
   S3BucketSecureURL:
     Value: !Join
       - ''
       - - 'https://'
-        - !GetAtt
-          - febucket
-          - DomainName
+        - !GetAtt FEBucket.DomainName
     Description: Name of S3 Bucket to hold website content
   
