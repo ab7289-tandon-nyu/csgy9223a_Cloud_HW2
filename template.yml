@@ -1,5 +1,5 @@
-AWSTemplateFormatVersion: '2010-09-09'
-Transform: 'AWS::Serverless-2016-10-31'
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: "AWS::Serverless-2016-10-31"
 Description: CloudFormation stack for the Intelligent Photo Album
 
 Parameters:
@@ -9,30 +9,50 @@ Parameters:
     Type: String
     NoEcho: true
 
-
 Resources:
   # S3 Bucket#############################################################################
   ImagesBucket:
     DependsOn: OpenSearchServiceDomain
-    Type: 'AWS::S3::Bucket'
+    Type: "AWS::S3::Bucket"
     DeletionPolicy: Delete
     Properties:
       CorsConfiguration:
         CorsRules:
           - AllowedHeaders:
-              - '*'
+              - "*"
             AllowedMethods:
               - PUT
               - GET
             AllowedOrigins:
-              - '*'
+              - "*"
             ExposedHeaders:
               - Date
             Id: myCORSRuleId1
-            MaxAge: 3600  
+            MaxAge: 3600
+
+  ImagesBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref ImagesBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Action:
+              - "s3:GetObject"
+            Effect: Allow
+            Resource: !Join
+              - ""
+              - - "arn:aws:s3:::"
+                - !Ref ImagesBucket
+                - /*
+            Principal: "*"
+            Condition:
+              StringLike:
+                "aws:Referer":
+                  - "http://*.s3-website-us-east-1.amazonaws.com/"
 
   SiteBucket:
-    Type: 'AWS::S3::Bucket'
+    Type: "AWS::S3::Bucket"
     Properties:
       AccessControl: PublicRead
       WebsiteConfiguration:
@@ -45,7 +65,7 @@ Resources:
               - "*"
 
   SiteBucketPolicy:
-    Type: 'AWS::S3::BucketPolicy'
+    Type: "AWS::S3::BucketPolicy"
     Properties:
       PolicyDocument:
         Id: MyPolicy
@@ -53,19 +73,18 @@ Resources:
         Statement:
           - Sid: PublicReadForGetBucketObjects
             Effect: Allow
-            Principal: '*'
-            Action: 's3:GetObject'
-            Resource: !Join 
-              - ''
-              - - 'arn:aws:s3:::'
+            Principal: "*"
+            Action: "s3:GetObject"
+            Resource: !Join
+              - ""
+              - - "arn:aws:s3:::"
                 - !Ref SiteBucket
                 - /*
       Bucket: !Ref SiteBucket
 
-
   # Lambdas ################################################################################
   PhotoIndexLambda:
-    Type: 'AWS::Serverless::Function'
+    Type: "AWS::Serverless::Function"
     DeletionPolicy: Delete
     Properties:
       Runtime: python3.9
@@ -113,8 +132,6 @@ Resources:
             Method: GET
             RestApiId: !Ref ApiGateway
 
-
-
   # Roles ###################################################################################
   # Role for Lambda
   TextRecognitionLambdaRole:
@@ -130,7 +147,7 @@ Resources:
               Service:
                 - lambda.amazonaws.com
                 - apigateway.amazonaws.com
-        Version: '2012-10-17'
+        Version: "2012-10-17"
       Path: /
       Policies:
         - PolicyDocument:
@@ -143,11 +160,11 @@ Resources:
                   - logs:PutLogEvents
                 Effect: Allow
                 Resource:
-                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*'
+                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*"
               - Action:
-                  - 's3:GetObject'
+                  - "s3:GetObject"
                 Effect: Allow
-                Resource: 'arn:aws:s3:::*'
+                Resource: "arn:aws:s3:::*"
               - Action:
                   - rekognition:detectLabels
                 Effect: Allow
@@ -156,7 +173,7 @@ Resources:
                   - lambda:InvokeFunction
                 Effect: Allow
                 Resource: "*"
-            Version: '2012-10-17'
+            Version: "2012-10-17"
           PolicyName: TextRecognitionLambdaPolicy
       RoleName: TextRecognitionLambdaRole
 
@@ -169,11 +186,11 @@ Resources:
         Statement:
           - Action: sts:AssumeRole
             Effect: Allow
-            Principal: 
+            Principal:
               Service:
                 - lambda.amazonaws.com
                 - apigateway.amazonaws.com
-        Version: '2012-10-17'
+        Version: "2012-10-17"
       Path: /
       ManagedPolicyArns:
         # access to run lex bot
@@ -184,7 +201,7 @@ Resources:
         - "arn:aws:iam::aws:policy/AmazonOpenSearchServiceReadOnlyAccess"
       Policies:
         - PolicyDocument:
-            Version: '2012-10-17'
+            Version: "2012-10-17"
             Statement:
               - Action:
                   - lambda:InvokeFunction
@@ -198,7 +215,7 @@ Resources:
                   - logs:PutLogEvents
                 Effect: Allow
                 Resource:
-                  - !Sub 'arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*'
+                  - !Sub "arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:*"
           PolicyName: "PhotoSearchLambdaPolicy"
 
   # Runtime Role for Lex
@@ -208,7 +225,7 @@ Resources:
     DeletionPolicy: Delete
     Properties:
       AssumeRolePolicyDocument:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
           - Effect: Allow
             Principal:
@@ -227,36 +244,35 @@ Resources:
     DeletionPolicy: Delete
     Properties:
       AssumeRolePolicyDocument:
-        Version: '2012-10-17'
+        Version: "2012-10-17"
         Statement:
           - Effect: Allow
             Principal:
               Service:
                 - apigateway.amazonaws.com
                 - lambda.amazonaws.com
-            Action: 
-              - 'sts:AssumeRole'
+            Action:
+              - "sts:AssumeRole"
       Policies:
         - PolicyDocument:
-            Version: '2012-10-17'
+            Version: "2012-10-17"
             Statement:
               - Effect: Allow
-                Action: 's3:*'
-                Resource: '*'
+                Action: "s3:*"
+                Resource: "*"
               - Effect: Allow
                 Action: lambda:InvokeFunction
                 Resource: "*"
               - Effect: Allow
                 Action:
-                  - 'kms:Decrypt'
-                  - 'kms:ReEncryptFrom'
+                  - "kms:Decrypt"
+                  - "kms:ReEncryptFrom"
                 Resource: "*"
           PolicyName: ApiGatewayS3RolePolicy
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
 
-
-# PERMISSIONS ################################################################3333#######
+  # PERMISSIONS ################################################################3333#######
   InvokeLambdaPermission:
     Type: "AWS::Lambda::Permission"
     DependsOn: OpenSearchServiceDomain
@@ -267,9 +283,7 @@ Resources:
       Principal: s3.amazonaws.com
       SourceArn: !GetAtt ImagesBucket.Arn
 
-
-
-# Lex Bot ###############################################################################
+  # Lex Bot ###############################################################################
   SearchPhotosBot:
     Type: AWS::Lex::Bot
     DependsOn: OpenSearchServiceDomain
@@ -359,8 +373,7 @@ Resources:
             Enabled: true
           LocaleId: en_US
 
-                            
-# API Gateway ########################################################################
+  # API Gateway ########################################################################
   ApiGateway:
     Type: AWS::Serverless::Api
     DependsOn: OpenSearchServiceDomain
@@ -369,11 +382,11 @@ Resources:
       Description: API Gateway for our photo search requests
       StageName: prod
       DefinitionBody:
-        'Fn::Transform':
-          Name: 'AWS::Include'
+        "Fn::Transform":
+          Name: "AWS::Include"
           Parameters:
-            Location: './api/swagger.yaml'
-      OpenApiVersion: '2.0'
+            Location: "./api/swagger.yaml"
+      OpenApiVersion: "2.0"
       Cors:
         AllowMethods:
           - PUT
@@ -382,10 +395,10 @@ Resources:
         AllowOrigin: "*"
       MethodSettings:
         - LoggingLevel: INFO
-          ResourcePath: '/*'
-          HttpMethod: '*'
+          ResourcePath: "/*"
+          HttpMethod: "*"
       BinaryMediaTypes:
-        - '*/*'
+        - "*/*"
 
   ApiDeployment:
     Type: AWS::ApiGateway::Deployment
@@ -394,12 +407,12 @@ Resources:
     Properties:
       RestApiId: !Ref ApiGateway
 
-  ApiKey: 
+  ApiKey:
     Type: AWS::ApiGateway::ApiKey
     DependsOn: OpenSearchServiceDomain
     DeletionPolicy: Delete
-    Properties: 
-      Name: !Join ["", [{"Ref": "AWS::StackName"}, "-apikey"]]
+    Properties:
+      Name: !Join ["", [{ "Ref": "AWS::StackName" }, "-apikey"]]
       Description: "CloudFormation API Key V1"
       Enabled: true
   ApiUsagePlan:
@@ -407,17 +420,17 @@ Resources:
     DependsOn: OpenSearchServiceDomain
     DeletionPolicy: Delete
     Properties:
-      ApiStages: 
-      - ApiId: !Ref ApiGateway
-        Stage: !Ref ApiGateway.Stage    
-      Description: !Join [" ", [{"Ref": "AWS::StackName"}, "usage plan"]]
+      ApiStages:
+        - ApiId: !Ref ApiGateway
+          Stage: !Ref ApiGateway.Stage
+      Description: !Join [" ", [{ "Ref": "AWS::StackName" }, "usage plan"]]
       Quota:
         Limit: 2000
         Period: MONTH
       Throttle:
         BurstLimit: 10
         RateLimit: 10
-      UsagePlanName: !Join ["", [{"Ref": "AWS::StackName"}, "-usage-plan"]]
+      UsagePlanName: !Join ["", [{ "Ref": "AWS::StackName" }, "-usage-plan"]]
   ApiUsagePlanKey:
     Type: "AWS::ApiGateway::UsagePlanKey"
     DependsOn: OpenSearchServiceDomain
@@ -431,15 +444,14 @@ Resources:
   ApiCloudWatchRoleArn:
     Type: AWS::ApiGateway::Account
     DeletionPolicy: Delete
-    DependsOn: 
+    DependsOn:
       - OpenSearchServiceDomain
       - ApiGateway
     # DependsOn: ApiGateway
     Properties:
       CloudWatchRoleArn: !GetAtt ApiGatewayS3Role.Arn
 
-
-# OpenSearch Domain ###################################################################
+  # OpenSearch Domain ###################################################################
   OpenSearchServiceDomain:
     Type: AWS::OpenSearchService::Domain
     DeletionPolicy: Delete
@@ -482,7 +494,6 @@ Resources:
       NodeToNodeEncryptionOptions:
         Enabled: true
 
-      
 Outputs:
   apiGatewayUrl:
     Value: !Sub https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod
@@ -492,14 +503,13 @@ Outputs:
     Value: !GetAtt SearchPhotosBot.Id
   LexBotAliasId:
     Value: !GetAtt BotAliasWithCFN.BotAliasId
-  
+
   WebsiteURL:
     Value: !GetAtt SiteBucket.WebsiteURL
     Description: URL for Website Hosted on S3
   S3BucketSecureURL:
     Value: !Join
-      - ''
-      - - 'https://'
+      - ""
+      - - "https://"
         - !GetAtt SiteBucket.DomainName
     Description: Name of S3 Bucket to hold website content
-  
