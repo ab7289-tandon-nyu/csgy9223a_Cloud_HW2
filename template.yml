@@ -29,11 +29,11 @@ Resources:
               - Date
             Id: myCORSRuleId1
             MaxAge: 3600  
-  febucket:
+  FEBucket:
     Type: 'AWS::S3::Bucket'
     Properties:
       AccessControl: PublicRead
-      BucketName: febucket
+      # BucketName: febucket
       WebsiteConfiguration:
         IndexDocument: index.html
 
@@ -469,16 +469,12 @@ Outputs:
     Value: !GetAtt BotAliasWithCFN.BotAliasId
   
   WebsiteURL:
-    Value: !GetAtt
-      - febucket
-      - WebsiteURL
+    Value: !GetAtt FEBucket.WebsiteURL
     Description: URL for Website Hosted on S3
   S3BucketSecureURL:
     Value: !Join
       - ''
       - - 'https://'
-        - !GetAtt
-          - febucket
-          - DomainName
+        - !GetAtt FEBucket.DomainName
     Description: Name of S3 Bucket to hold website content
   
