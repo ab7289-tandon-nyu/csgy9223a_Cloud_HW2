@@ -63,6 +63,8 @@ Resources:
               - "PUT"
             AllowedOrigins:
               - "*"
+            AllowedHeaders:
+              - "*"
             ExposedHeaders:
               - Access-Control-Allow-Origin
 
