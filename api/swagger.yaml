@@ -1,7 +1,7 @@
-swagger: '2.0'
+swagger: "2.0"
 info:
   title: AI Photo Search
-  description: 'AI Photo Search application, built during the Cloud and Big Data course at Columbia University.'
+  description: "AI Photo Search application, built during the Cloud and Big Data course at Columbia University."
   version: 1.0.0
 schemes:
   - https
@@ -24,33 +24,33 @@ paths:
       produces:
         - application/json
       responses:
-        '200':
+        "200":
           description: search results
           schema:
-            $ref: '#/definitions/SearchResponse'
-        '403':
+            $ref: "#/definitions/SearchResponse"
+        "403":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/Error'
-        '500':
+            $ref: "#/definitions/Error"
+        "500":
           description: Unexpected error
           schema:
-            $ref: '#/definitions/Error'
+            $ref: "#/definitions/Error"
       x-amazon-apigateway-integration:
         responses:
-          default: 
+          default:
             statusCode: "200"
           "BAD.*":
             statusCode: "400"
           "INT.*":
             statusCode: "500"
         credentials:
-          Fn::Sub: '${ApiGatewayS3Role.Arn}'
+          Fn::Sub: "${ApiGatewayS3Role.Arn}"
         passthroughBehaviour: "when_no_match"
         httpMethod: POST
         type: AWS_PROXY
         uri:
-          Fn::Sub: 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PhotoSearchLambda.Arn}/invocations'
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${PhotoSearchLambda.Arn}/invocations"
     options:
       summary: CORS Support
       description: |
@@ -79,7 +79,7 @@ paths:
               application/json: |
                 {}
       responses:
-        '200':
+        "200":
           description: Default response from CORS method
           headers:
             Access-Control-Allow-Headers:
@@ -114,34 +114,36 @@ paths:
           required: false
           type: string
       responses:
-        '200':
+        "200":
           description: S3 PUT operation response
           schema:
             type: object
-        '403':
+        "403":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/Error'
-        '500':
+            $ref: "#/definitions/Error"
+        "500":
           description: Unexpected error
           schema:
-            $ref: '#/definitions/Error'
+            $ref: "#/definitions/Error"
       x-amazon-apigateway-integration:
         responses:
-          default: 
+          default:
             statusCode: "200"
           "BAD.*":
             statusCode: "400"
           "INT.*":
             statusCode: "500"
-        credentials: 
-          Fn::Sub: '${ApiGatewayS3Role.Arn}'
+        credentials:
+          Fn::Sub: "${ApiGatewayS3Role.Arn}"
         requestParameters:
           integration.request.path.item: "method.request.path.item"
           integration.request.header.Content-Type: "method.request.header.Content-Type"
           integration.request.header.x-amz-meta-customLabels: "method.request.header.x-amz-meta-customLabels"
-        uri: 
-          Fn::Sub: 'arn:aws:apigateway:${AWS::Region}:s3:path/${ImagesBucket}/{item}'
+        responseParameters:
+          integration.response.header.Access-Control-Allow-Origin: "'*'"
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:s3:path/${ImagesBucket}/{item}"
         passthroughBehaviour: "when_no_match"
         httpMethod: PUT
         type: AWS
@@ -173,7 +175,7 @@ paths:
               application/json: |
                 {}
       responses:
-        '200':
+        "200":
           description: Default response from CORS method
           headers:
             Access-Control-Allow-Headers:
@@ -189,7 +191,7 @@ definitions:
       results:
         type: array
         items:
-          $ref: '#/definitions/Photo'
+          $ref: "#/definitions/Photo"
   Photo:
     type: object
     properties:
