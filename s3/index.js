@@ -138,11 +138,12 @@ function uploadPhoto() {
     var filePath = (document.getElementById('uploaded_file').value).split("\\");
     var fileName = filePath[filePath.length - 1];
 
-    if (!document.getElementById('custom_labels').innerText == "") {
-        var customLabels = document.getElementById('custom_labels');
+    let customLabels;
+    if (document.getElementById('custom_labels').value !== "") {
+        customLabels = document.getElementById('custom_labels').value;
     }
     console.log(fileName);
-    console.log(custom_labels.value);
+    console.log(customLabels);
 
     var reader = new FileReader();
     var file = document.getElementById('uploaded_file').files[0];
@@ -153,19 +154,19 @@ function uploadPhoto() {
         alert("Please upload a valid .png/.jpg/.jpeg file!");
     } else {
 
-        var params = {};
-        var additionalParams = {
-            headers: {
-                'item': file.name,
-                'Content-Type': file.type,
-                'x-amz-meta-customLabels': custom_labels.value
-            }
+        var params = {
+            //headers: {
+            'item': file.name,
+            'Content-Type': file.type,
+            'x-amz-meta-customLabels': customLabels
+            //}
         };
+        var additionalParams = {};
 
         reader.onload = function (event) {
             body = btoa(event.target.result);
             console.log('Reader body : ', body);
-            return apigClient.uploadItemPut(params, additionalParams)
+            return apigClient.uploadItemPut(params, body, additionalParams)
                 .then(function (result) {
                     console.log(result);
                 })
