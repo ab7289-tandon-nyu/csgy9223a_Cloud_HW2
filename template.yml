@@ -23,10 +23,12 @@ Resources:
             AllowedMethods:
               - PUT
               - GET
+              - HEAD
             AllowedOrigins:
               - "*"
             ExposedHeaders:
               - Date
+              - Access-Control-Allow-Origin
             Id: myCORSRuleId1
             MaxAge: 3600
 
