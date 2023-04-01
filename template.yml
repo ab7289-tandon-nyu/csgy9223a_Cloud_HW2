@@ -23,6 +23,7 @@ Resources:
             AllowedMethods:
               - PUT
               - GET
+              - OPTIONS
             AllowedOrigins:
               - "*"
             ExposedHeaders:
