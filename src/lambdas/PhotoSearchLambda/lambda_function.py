@@ -46,7 +46,7 @@ def query_opensearch(searchTerms: list[str]) -> list[dict]:
                          os.getenv("OpenSearch_Password"))
     response = requests.get(url, headers=headers, json=query, auth=auth)
     response.raise_for_status()
-    
+
     return parse_os_response(response.json())
 
 
@@ -126,9 +126,10 @@ def lambda_handler(event: dict, context: dict) -> dict:
     response: dict = {
         "isBase64Encoded": False,
         "statusCode": 200 if len(s3_img_urls) > 0 else 204,
-        "headers": {"Content-Type": "application/json"},
+        "headers": {"Content-Type": "application/json",
+                    'Access-Control-Allow-Origin': '*', },
         "multiValueHeaders": {},
         "body": json.dumps(s3_img_urls)
     }
-    
+
     return response

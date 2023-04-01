@@ -131,3 +131,4 @@ dmypy.json
 .aws-sam
 
 samconfig.toml
+.vscode

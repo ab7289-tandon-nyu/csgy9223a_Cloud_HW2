@@ -23,19 +23,44 @@ Resources:
               - '*'
             AllowedMethods:
               - PUT
+              - GET
             AllowedOrigins:
               - '*'
             ExposedHeaders:
               - Date
             Id: myCORSRuleId1
             MaxAge: 3600  
-  FEBucket:
+
+  SiteBucket:
     Type: 'AWS::S3::Bucket'
     Properties:
       AccessControl: PublicRead
-      ## BucketName: febucket
       WebsiteConfiguration:
         IndexDocument: index.html
+      CorsConfiguration:
+        CorsRules:
+          - AllowedMethods:
+              - "GET"
+            AllowedOrigins:
+              - "*"
+
+  SiteBucketPolicy:
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      PolicyDocument:
+        Id: MyPolicy
+        Version: 2012-10-17
+        Statement:
+          - Sid: PublicReadForGetBucketObjects
+            Effect: Allow
+            Principal: '*'
+            Action: 's3:GetObject'
+            Resource: !Join 
+              - ''
+              - - 'arn:aws:s3:::'
+                - !Ref SiteBucket
+                - /*
+      Bucket: !Ref SiteBucket
 
 
   # Lambdas ################################################################################
@@ -469,12 +494,12 @@ Outputs:
     Value: !GetAtt BotAliasWithCFN.BotAliasId
   
   WebsiteURL:
-    Value: !GetAtt FEBucket.WebsiteURL
+    Value: !GetAtt SiteBucket.WebsiteURL
     Description: URL for Website Hosted on S3
   S3BucketSecureURL:
     Value: !Join
       - ''
       - - 'https://'
-        - !GetAtt FEBucket.DomainName
+        - !GetAtt SiteBucket.DomainName
     Description: Name of S3 Bucket to hold website content
   
