@@ -1,0 +1,36 @@
+{
+    "data": [
+        {
+            "url": "https://csgy9223a-hw2-photo-stack-imagesbucket-1kh9q0llba7hn.s3.amazonaws.com/bird1.jpg",
+            "labels": [
+                "Animal",
+                "Bird",
+                "Finch",
+                "Canary",
+                "Beak"
+            ]
+        }
+    ],
+    "status": 200,
+    "statusText": "",
+    "headers": {
+        "content-length": "157",
+        "content-type": "application/json"
+    },
+    "config": {
+        "method": "GET",
+        "headers": {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+        },
+        "timeout": 0,
+        "transformRequest": [
+            null
+        ],
+        "transformResponse": [
+            null
+        ],
+        "url": "https://sl4kl9vrk0.execute-api.us-east-1.amazonaws.com/prod/search?q=bird",
+        "data": ""
+    }
+}
