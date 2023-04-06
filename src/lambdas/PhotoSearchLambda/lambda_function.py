@@ -101,9 +101,13 @@ def disambiguate(query: str) -> list:
     print(f"Lex response: {response}")
 
     intent: dict = response['sessionState']['intent']
-    searchSlot: dict = intent['slots']['SearchTerms']
+    slots: dict = intent['slots']
+    searchSlot: dict = slots.get('SearchTerms')
 
-    return list([slotVal['value']['interpretedValue'] for slotVal in searchSlot['values']])
+    if slots is not None:
+        return list([slotVal['value']['interpretedValue'] for slotVal in searchSlot['values']])
+    else:
+        return []
 
 
 def lambda_handler(event: dict, context: dict) -> dict:
