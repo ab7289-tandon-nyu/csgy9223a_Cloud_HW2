@@ -86,7 +86,7 @@ def disambiguate(query: str) -> list:
 
     Parameters:
     :queryString string: the text string that the user input
-    :returns: list of disambiguated search terms
+    :returns: list of disambiguated search terms.
     """
 
     client = boto3.client('lexv2-runtime')
