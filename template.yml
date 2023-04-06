@@ -502,8 +502,8 @@ Resources:
 Outputs:
   apiGatewayUrl:
     Value: !Sub https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod
-  DomainEndpoint:
-    Value: !GetAtt OpenSearchServiceDomain.DomainEndpoint
+  # DomainEndpoint:
+  #   Value: !GetAtt OpenSearchServiceDomain.DomainEndpoint
   LexBotVersion:
     Value: !GetAtt SearchPhotosBot.Id
   LexBotAliasId:
