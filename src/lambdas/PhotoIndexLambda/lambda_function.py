@@ -22,7 +22,7 @@ OS_URL: str = OS_DOMAIN + "/" + INDEX + "/" + ENDPOINT
 class RekognitionImage:
     """
     Encapsulates an Amazon Rekognition image. This class is a thin wrapper
-    around parts of the Boto3 Amazon Rekognition API. 
+    around parts of the Boto3 Amazon Rekognition API.
     """
 
     def __init__(self, image, image_name, rekognition_client):
