@@ -12,7 +12,7 @@ Parameters:
 Resources:
   # S3 Bucket#############################################################################
   ImagesBucket:
-    # # DependsOn: OpenSearchServiceDomain
+    # DependsOn: OpenSearchServiceDomain
     Type: "AWS::S3::Bucket"
     DeletionPolicy: Delete
     Properties:
@@ -52,7 +52,7 @@ Resources:
 
   SiteBucket:
     Type: "AWS::S3::Bucket"
-    # DependsOn: OpenSearchServiceDomain
+    DependsOn: OpenSearchServiceDomain
     Properties:
       AccessControl: PublicRead
       WebsiteConfiguration:
@@ -141,7 +141,7 @@ Resources:
   # Role for Lambda
   TextRecognitionLambdaRole:
     Type: AWS::IAM::Role
-    # DependsOn: OpenSearchServiceDomain
+    DependsOn: OpenSearchServiceDomain
     DeletionPolicy: Delete
     Properties:
       AssumeRolePolicyDocument:
@@ -184,7 +184,7 @@ Resources:
 
   LexLambdaRole:
     Type: AWS::IAM::Role
-    # DependsOn: OpenSearchServiceDomain
+    DependsOn: OpenSearchServiceDomain
     DeletionPolicy: Delete
     Properties:
       AssumeRolePolicyDocument:
@@ -226,7 +226,7 @@ Resources:
   # Runtime Role for Lex
   LexRuntimeRole:
     Type: AWS::IAM::Role
-    # DependsOn: OpenSearchServiceDomain
+    DependsOn: OpenSearchServiceDomain
     DeletionPolicy: Delete
     Properties:
       AssumeRolePolicyDocument:
@@ -245,7 +245,7 @@ Resources:
 
   ApiGatewayS3Role:
     Type: AWS::IAM::Role
-    # DependsOn: OpenSearchServiceDomain
+    DependsOn: OpenSearchServiceDomain
     DeletionPolicy: Delete
     Properties:
       AssumeRolePolicyDocument:
@@ -280,7 +280,7 @@ Resources:
   # PERMISSIONS ################################################################3333#######
   InvokeLambdaPermission:
     Type: "AWS::Lambda::Permission"
-    # DependsOn: OpenSearchServiceDomain
+    DependsOn: OpenSearchServiceDomain
     DeletionPolicy: Delete
     Properties:
       FunctionName: !GetAtt PhotoIndexLambda.Arn
@@ -291,7 +291,7 @@ Resources:
   # Lex Bot ###############################################################################
   SearchPhotosBot:
     Type: AWS::Lex::Bot
-    # DependsOn: OpenSearchServiceDomain
+    DependsOn: OpenSearchServiceDomain
     DeletionPolicy: Delete
     Properties:
       Name: "PhotoSearchBot"
@@ -353,7 +353,7 @@ Resources:
 
   TemplateBotVersionWithCFN:
     Type: AWS::Lex::BotVersion
-    # DependsOn: OpenSearchServiceDomain
+    DependsOn: OpenSearchServiceDomain
     DeletionPolicy: Delete
     Properties:
       BotId: !Ref SearchPhotosBot
@@ -365,7 +365,7 @@ Resources:
 
   BotAliasWithCFN:
     Type: AWS::Lex::BotAlias
-    # DependsOn: OpenSearchServiceDomain
+    DependsOn: OpenSearchServiceDomain
     DeletionPolicy: Delete
     Properties:
       BotId: !Ref SearchPhotosBot
@@ -381,7 +381,7 @@ Resources:
   # API Gateway ########################################################################
   ApiGateway:
     Type: AWS::Serverless::Api
-    # DependsOn: OpenSearchServiceDomain
+    DependsOn: OpenSearchServiceDomain
     DeletionPolicy: Delete
     Properties:
       Description: API Gateway for our photo search requests
@@ -407,14 +407,14 @@ Resources:
 
   ApiDeployment:
     Type: AWS::ApiGateway::Deployment
-    # DependsOn: OpenSearchServiceDomain
+    DependsOn: OpenSearchServiceDomain
     DeletionPolicy: Delete
     Properties:
       RestApiId: !Ref ApiGateway
 
   ApiKey:
     Type: AWS::ApiGateway::ApiKey
-    # DependsOn: OpenSearchServiceDomain
+    DependsOn: OpenSearchServiceDomain
     DeletionPolicy: Delete
     Properties:
       Name: !Join ["", [{ "Ref": "AWS::StackName" }, "-apikey"]]
@@ -422,7 +422,7 @@ Resources:
       Enabled: true
   ApiUsagePlan:
     Type: "AWS::ApiGateway::UsagePlan"
-    # DependsOn: OpenSearchServiceDomain
+    DependsOn: OpenSearchServiceDomain
     DeletionPolicy: Delete
     Properties:
       ApiStages:
@@ -438,7 +438,7 @@ Resources:
       UsagePlanName: !Join ["", [{ "Ref": "AWS::StackName" }, "-usage-plan"]]
   ApiUsagePlanKey:
     Type: "AWS::ApiGateway::UsagePlanKey"
-    # DependsOn: OpenSearchServiceDomain
+    DependsOn: OpenSearchServiceDomain
     DeletionPolicy: Delete
     Properties:
       KeyId: !Ref ApiKey
@@ -450,60 +450,60 @@ Resources:
     Type: AWS::ApiGateway::Account
     DeletionPolicy: Delete
     DependsOn:
-      # - OpenSearchServiceDomain
+      - OpenSearchServiceDomain
       - ApiGateway
     # DependsOn: ApiGateway
     Properties:
       CloudWatchRoleArn: !GetAtt ApiGatewayS3Role.Arn
 
   # OpenSearch Domain ###################################################################
-  # OpenSearchServiceDomain:
-  #   Type: AWS::OpenSearchService::Domain
-  #   DeletionPolicy: Delete
-  #   Properties:
-  #     DomainName: "csgy-9223a-hw2-photos"
-  #     EngineVersion: "OpenSearch_2.5"
-  #     ClusterConfig:
-  #       DedicatedMasterEnabled: False
-  #       InstanceCount: 1
-  #       InstanceType: "t3.small.search"
-  #       ZoneAwarenessEnabled: false
-  #       WarmEnabled: false
-  #     CognitoOptions:
-  #       Enabled: false
-  #     EBSOptions:
-  #       EBSEnabled: true
-  #       Iops: 0
-  #       VolumeSize: 10
-  #       VolumeType: "gp2"
-  #     AccessPolicies:
-  #       Version: "2012-10-17"
-  #       Statement:
-  #         - Effect: Allow
-  #           Principal:
-  #             AWS: "*"
-  #           Action: "es:*"
-  #           Resource: !Sub "arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/csgy-9223a-hw2-photos/*"
-  #     AdvancedSecurityOptions:
-  #       Enabled: true
-  #       InternalUserDatabaseEnabled: true
-  #       MasterUserOptions:
-  #         MasterUserName: !Ref OpenSearchUser
-  #         MasterUserPassword: !Ref OpenSearchPassword
-  #     DomainEndpointOptions:
-  #       CustomEndpointEnabled: false
-  #       EnforceHTTPS: true
-  #       TLSSecurityPolicy: Policy-Min-TLS-1-0-2019-07
-  #     EncryptionAtRestOptions:
-  #       Enabled: true
-  #     NodeToNodeEncryptionOptions:
-  #       Enabled: true
+  OpenSearchServiceDomain:
+    Type: AWS::OpenSearchService::Domain
+    DeletionPolicy: Delete
+    Properties:
+      DomainName: "csgy-9223a-hw2-photos"
+      EngineVersion: "OpenSearch_2.5"
+      ClusterConfig:
+        DedicatedMasterEnabled: False
+        InstanceCount: 1
+        InstanceType: "t3.small.search"
+        ZoneAwarenessEnabled: false
+        WarmEnabled: false
+      CognitoOptions:
+        Enabled: false
+      EBSOptions:
+        EBSEnabled: true
+        Iops: 0
+        VolumeSize: 10
+        VolumeType: "gp2"
+      AccessPolicies:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: "*"
+            Action: "es:*"
+            Resource: !Sub "arn:aws:es:${AWS::Region}:${AWS::AccountId}:domain/csgy-9223a-hw2-photos/*"
+      AdvancedSecurityOptions:
+        Enabled: true
+        InternalUserDatabaseEnabled: true
+        MasterUserOptions:
+          MasterUserName: !Ref OpenSearchUser
+          MasterUserPassword: !Ref OpenSearchPassword
+      DomainEndpointOptions:
+        CustomEndpointEnabled: false
+        EnforceHTTPS: true
+        TLSSecurityPolicy: Policy-Min-TLS-1-0-2019-07
+      EncryptionAtRestOptions:
+        Enabled: true
+      NodeToNodeEncryptionOptions:
+        Enabled: true
 
 Outputs:
   apiGatewayUrl:
     Value: !Sub https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com/prod
-  # DomainEndpoint:
-  #   Value: !GetAtt OpenSearchServiceDomain.DomainEndpoint
+  DomainEndpoint:
+    Value: !GetAtt OpenSearchServiceDomain.DomainEndpoint
   LexBotVersion:
     Value: !GetAtt SearchPhotosBot.Id
   LexBotAliasId:
