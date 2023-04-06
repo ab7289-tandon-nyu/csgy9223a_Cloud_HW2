@@ -52,6 +52,7 @@ Resources:
 
   SiteBucket:
     Type: "AWS::S3::Bucket"
+    DependsOn: OpenSearchServiceDomain
     Properties:
       AccessControl: PublicRead
       WebsiteConfiguration:
