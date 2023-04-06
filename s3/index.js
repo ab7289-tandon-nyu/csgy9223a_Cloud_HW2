@@ -54,6 +54,10 @@ function textSearch() {
 
 }
 
+function getApiAuth() {
+    return { "Authorization": "Bearer MZv2yJ4qAg1nQvXbDhWAh5gFqjEUGbFC7OjCh5dm" };
+}
+
 function searchPhotos(searchText) {
 
     console.log(searchText);
@@ -63,6 +67,7 @@ function searchPhotos(searchText) {
     var params = {
         'q': searchText
     };
+    params = { ...params, ...getApiAuth() };
 
     apigClient.searchGet(params, {}, {})
         .then(function (result) {
@@ -161,6 +166,7 @@ function uploadPhoto() {
             'x-amz-meta-customLabels': customLabels
             //}
         };
+        params = { ...params, ...getApiAuth() };
         var additionalParams = {};
 
         reader.onload = function (event) {
