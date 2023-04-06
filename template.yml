@@ -8,6 +8,8 @@ Parameters:
   OpenSearchPassword:
     Type: String
     NoEcho: true
+  OpenSearchDomain:
+    Type: String
 
 Resources:
   # S3 Bucket#############################################################################
@@ -110,6 +112,7 @@ Resources:
           OpenSearch_User: !Ref OpenSearchUser
           OpenSearch_Passwored: !Ref OpenSearchPassword
           # OpenSearch_Domain: !GetAtt OpenSearchServiceDomain.DomainEndpoint
+          OpenSearch_Domain: !Ref OpenSearchDomain
 
   PhotoSearchLambda:
     Type: "AWS::Serverless::Function"
@@ -129,6 +132,7 @@ Resources:
           LexBotId: !GetAtt SearchPhotosBot.Id
           LexBotAliasId: !GetAtt BotAliasWithCFN.BotAliasId
           # OpenSearch_Domain: !GetAtt OpenSearchServiceDomain.DomainEndpoint
+          OpenSearch_Domain: !Ref OpenSearchDomain
       Events:
         APIEvent:
           Type: Api
