@@ -1,0 +1,24 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.9
+  build:
+    commands:
+      - sam build
+
+  # post_build:
+  #   commands:
+  #     - sam package --output-template-file template.yml --s3-bucket codepipeline-us-east-1-891057533035
+
+  post_build:
+    commands:
+      - aws cloudformation package --template .aws-sam/build/template.yaml --kms-key-id arn:aws:kms:us-east-1:979351636556:alias/aws/s3 --s3-bucket codepipeline-us-east-1-891057533035 --output-template template.yml
+
+artifacts:
+  # files:
+  #   - '**/*'
+  type: zip
+  files:
+    - template.yml
